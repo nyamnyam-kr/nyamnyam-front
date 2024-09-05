@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
+import Link from "next/link";
 import "./globals.css";
 
 const inter = Inter({ subsets: ["latin"] });
@@ -16,7 +17,58 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={inter.className}>{children}</body>
+      <head>
+        <title>냠냠 먹자</title>
+        {/* API 추가 */}
+      </head>
+      <body className={inter.className}>
+        <header style={styles.header}>
+          <nav style={styles.nav}>
+            <ul style={styles.navList}>
+              <li style={styles.navItem}>
+                <Link href="/">홈</Link>
+              </li>
+              <li style={styles.navItem}>
+                <Link href="/about">소개</Link>
+              </li>
+              <li style={styles.navItem}>
+                <Link href="/contact">문의</Link>
+              </li>
+            </ul>
+          </nav>
+        </header>
+        <div style={styles.content}>
+          {children}
+        </div>
+      </body>
     </html>
   );
 }
+
+const styles = {
+  header: {
+    backgroundColor: "#007bff",
+    padding: "10px 20px",
+  },
+  nav: {
+    maxWidth: "1200px",
+    margin: "0 auto",
+    display: "flex",
+    justifyContent: "space-between",
+  },
+  navList: {
+    listStyle: "none",
+    display: "flex",
+    gap: "20px",
+    margin: 0,
+    padding: 0,
+  },
+  navItem: {
+    color: "white",
+    textDecoration: "none",
+    fontWeight: "bold",
+  },
+  content: {
+    padding: "20px",
+  },
+};
