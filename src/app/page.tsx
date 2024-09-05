@@ -5,7 +5,7 @@ export default function Home2() {
     const [data, setData] = useState({ hotelList: [] });
 
     useEffect(() => {
-        fetch('http://211.188.50.43:8080/restaurant/findAll')
+        fetch('http://localhost:8080/restaurant/findAll')
             .then((response) => {
                 if (!response.ok) {
                     throw new Error('Network response was not ok');
@@ -26,7 +26,7 @@ export default function Home2() {
     }
 
     return (
-        <main className="flex min-h-screen flex-col items-center p-6 bg-gray-100">
+        <main className="flex min-h-screen flex-col items-center p-6 ">
             <div className="w-full max-w-4xl bg-white shadow-lg rounded-lg p-6">
                 <button
                     className="mb-4 bg-blue-500 text-white py-2 px-4 rounded-lg hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-300"
