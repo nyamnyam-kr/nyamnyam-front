@@ -4,17 +4,11 @@ This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next
 
 First, run the development server:
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+yarn dev 으로 실행합니다.
+
+
+Open [http://localhost:3000](http://localhost:3000) 주소 사용을 권장합니다!!! (3001로 열면 포트 번호 반드시 확인하기!)
 
 You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
 
