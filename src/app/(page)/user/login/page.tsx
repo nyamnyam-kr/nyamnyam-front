@@ -11,11 +11,12 @@ export default function Login() {
 
     const handleLogin = async () => {
         try {
-            const response = await fetch('http://211.188.50.33:8080/user/login', {
+            const response = await fetch('http://localhost:8080/user/auth', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                 },
+                credentials: 'include',
                 body: JSON.stringify({
                     username,
                     password
@@ -26,8 +27,8 @@ export default function Login() {
                 throw new Error('로그인 실패');
             }
 
-            // 로그인 성공 처리
             setLoginSuccess(true);
+            alert('로그인 성공! 홈으로 이동합니다.');
             router.push('/'); // 로그인 성공 후 홈으로 이동
         } catch (error) {
             console.error('로그인에 문제가 발생했습니다:', error);
