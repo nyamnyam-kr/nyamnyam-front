@@ -15,7 +15,7 @@ export default function Register() {
 
     const handleRegister = async () => {
         try {
-            const response = await fetch('http://211.188.50.33:8080/user/join', {
+            const response = await fetch('http://localhost:8080/user/join', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
