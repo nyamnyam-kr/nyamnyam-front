@@ -5,14 +5,17 @@ export async function save(restaurant: RestaurantModel): Promise<any | {status: 
             id: restaurant.id,
             name: restaurant.name,
             tel: restaurant.tel,
-            address: restaurant.address
+            address: restaurant.address,
+            operateTime: restaurant.operateTime
         }
-        const response = await fetch('http://211.188.50.43:8080/restaurants/save', {
+        console.log(restaurantModel)
+        const response = await fetch('http://localhost:8080/restaurant/save', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
             },
             body: JSON.stringify(restaurantModel)
+            
         });
         const data: any = await response.json();
         return data;

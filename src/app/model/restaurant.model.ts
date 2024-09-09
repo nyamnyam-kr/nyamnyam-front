@@ -3,5 +3,6 @@ interface RestaurantModel {
     name: string;
     tel: number;
     address: string;
+    operateTime: string;
 }
 
