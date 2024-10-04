@@ -12,6 +12,7 @@ import { ChatModel } from "src/app/model/chat.model";
 import { getNotReadParticipantsCount, getUnreadCount, markMessageAsRead, updateReadBy } from "src/app/api/chat/chat.api";
 import { EmojiClickData } from "emoji-picker-react";
 import dynamic from "next/dynamic"; // Next.js의 dynamic import 사용
+import EmojiPicker from "src/app/components/EmojiPicker";
 
 export default function Home1() {
   const [chatRooms, setChatRooms] = useState<ChatRoomModel[]>([]);
@@ -21,7 +22,7 @@ export default function Home1() {
   const [searchTerm, setSearchTerm] = useState('');
   const [messages, setMessages] = useState<ChatModel[]>([]);
   const [newMessage, setNewMessage] = useState("");
-  const [showEmojiPicker, setShowEmojiPicker] = useState<boolean>(false);
+  const [showEmojis, setShowEmojis] = useState(false); // 이모티콘 패널 표시 상태
 
   const [sender, setSender] = useState<string>(""); // 사용자 ID
   const [unreadCount, setUnreadCount] = useState<number>(0); // 읽지 않은 메시지 수
@@ -191,6 +192,11 @@ export default function Home1() {
       console.error(error);
       alert('메시지 전송 중 오류가 발생했습니다.'); // 사용자에게 알림
     }
+  };
+
+  // 이모티콘 선택 핸들러 함수
+  const handleEmojiSelect = (emoji: string) => {
+    setNewMessage((prevMessage) => prevMessage + emoji);
   };
 
   const handleDelete = async () => {
@@ -449,13 +455,13 @@ export default function Home1() {
                   <div className="chat-messages-footer">
                     <form onSubmit={sendMessage} className="chat-messages-form flex mt-4">
                       <div className="chat-messages-form-controls flex-grow">
+                      <EmojiPicker onSelectEmoji={handleEmojiSelect} /> {/* 이모지 선택 컴포넌트 삽입 */}
                         <input
                           type="text"
-                          placeholder="Type your message..."
                           value={newMessage}
                           onChange={(e) => setNewMessage(e.target.value)}
-                          className="chat-messages-input border border-gray-300 p-2"
-                          required
+                          placeholder="메시지를 입력하세요..."
+                          className="message-input-field"
                         />
                       </div>
                       <button
@@ -464,7 +470,7 @@ export default function Home1() {
                       >
                         Send
                       </button>
-                    </form>  
+                    </form>
                   </div>
                 </>
               ) : null}
