@@ -10,7 +10,6 @@ import { sendMessageService, subscribeMessages } from "src/app/service/chat/chat
 import { ChatRoomModel } from "src/app/model/chatRoom.model";
 import { ChatModel } from "src/app/model/chat.model";
 import { getNotReadParticipantsCount, getUnreadCount, markMessageAsRead, updateReadBy } from "src/app/api/chat/chat.api";
-import { EmojiClickData } from "emoji-picker-react";
 import dynamic from "next/dynamic"; // Next.js의 dynamic import 사용
 import EmojiPicker from "src/app/components/EmojiPicker";
 
@@ -194,10 +193,16 @@ export default function Home1() {
     }
   };
 
+  const toggleEmojiPicker = () => {
+    setShowEmojis((prev) => !prev);
+  };
+
   // 이모티콘 선택 핸들러 함수
   const handleEmojiSelect = (emoji: string) => {
     setNewMessage((prevMessage) => prevMessage + emoji);
   };
+
+
 
   const handleDelete = async () => {
     if (selectChatRooms.length === 0) {
@@ -455,7 +460,22 @@ export default function Home1() {
                   <div className="chat-messages-footer">
                     <form onSubmit={sendMessage} className="chat-messages-form flex mt-4">
                       <div className="chat-messages-form-controls flex-grow">
-                      <EmojiPicker onSelectEmoji={handleEmojiSelect} /> {/* 이모지 선택 컴포넌트 삽입 */}
+                        {/* 이모지 선택 버튼 */}
+                        <button
+                          type="button"
+                          onClick={toggleEmojiPicker} // 버튼 클릭 시 이모지 창 표시/숨김 토글
+                          className="emoji-picker-button px-2 py-1 rounded-md mr-2 border"
+                        >
+                          😊
+                        </button>
+
+                        {/* 이모지 선택 창 표시 여부에 따라 렌더링 */}
+                        {showEmojis && (
+                          <div className="absolute bottom-16 left-0 z-50">
+                            <EmojiPicker onSelectEmoji={handleEmojiSelect} />
+                          </div>
+                        )}
+
                         <input
                           type="text"
                           value={newMessage}
