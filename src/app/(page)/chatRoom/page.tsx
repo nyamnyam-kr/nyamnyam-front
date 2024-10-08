@@ -48,7 +48,6 @@ export default function Home1() {
   useEffect(() => {
     const nickname = localStorage.getItem('nickname');
     if (nickname) {
-
       setSender(nickname); // 로그인된 사용자의 닉네임으로 sender 초기화
       fetchData(nickname);
     }
@@ -88,7 +87,7 @@ export default function Home1() {
     };
 
     fetchUnreadCounts();
-  }, [sender, chatRooms]);
+  }, [sender]); // chatRooms를 의존성에서 제거
 
   // 읽지 않은 참가자 수를 계산하는 함수
   const countNotReadParticipants = (message: ChatModel) => {
@@ -97,16 +96,13 @@ export default function Home1() {
   };
 
   // 선택된 채팅방의 메시지를 가져오고 읽음 상태 처리하기
-  useEffect(() => {
+   useEffect(() => {
     if (!selectedChatRoomId) return;
 
-    // 채팅방 정보 가져오기
     getChatRoomDetails(selectedChatRoomId)
       .then((data) => {
         setSelectedChatRoom(data);
         setMessages(data.messages || []); // 초기 메시지 설정
-        setUnreadCount(0); // 채팅방 열 때 unreadCount를 0으로 설정
-
         // 읽지 않은 메시지 수를 0으로 설정
         setChatRooms((prevRooms) =>
           prevRooms.map((room) =>
@@ -116,14 +112,14 @@ export default function Home1() {
       })
       .catch((error) => console.error(error));
 
-    // 메시지 스트리밍 구독
-    const eventSource = new EventSource(`http://localhost:8081/api/chats/${selectedChatRoomId}`);
+      const token = localStorage.getItem('token');
+      // 메시지 스트리밍 구독
+      const eventSource = new EventSource(`http://localhost:8081/api/chats/${selectedChatRoomId}?token=${token}`);
 
     eventSource.onmessage = async (event) => {
       const newMessage = JSON.parse(event.data);
 
       setMessages((prevMessages) => {
-        // 새 메시지가 이미 존재하는지 확인
         const messageExists = prevMessages.some(msg => msg.id === newMessage.id);
         if (!messageExists) {
           // 새 메시지를 기존 메시지 목록에 추가
@@ -142,16 +138,15 @@ export default function Home1() {
                       : msg
                   )
                 );
+
                 // 채팅방의 unreadCount를 업데이트
                 setChatRooms((prevChatRooms) =>
                   prevChatRooms.map((room) =>
                     room.id === selectedChatRoomId
-                      ? { ...room, unreadCount: Math.max(room.unreadCount - 1, 0) } // unreadCount 감소
+                      ? { ...room, unreadCount: Math.max(room.unreadCount - 1, 0) }
                       : room
                   )
                 );
-                // 다른 클라이언트에서도 unreadCount를 업데이트하도록 로직 추가
-                updateUnreadCount(newMessage);
               })
               .catch((error) => console.error('Failed to mark message as read:', error));
           }
@@ -170,7 +165,7 @@ export default function Home1() {
     return () => {
       eventSource.close(); // 컴포넌트 언마운트 시 EventSource 닫기
     };
-  }, [selectedChatRoomId]);
+  }, [selectedChatRoomId]); // chatRooms를 의존성에서 제거
 
   const updateUnreadCount = (message: ChatModel) => {
     setChatRooms((prevChatRooms) =>
@@ -210,8 +205,8 @@ export default function Home1() {
   };
 
 
-   // CKEditor의 onChange 이벤트를 통해 입력된 메시지 업데이트
-   const handleEditorChange = (event: any, editor: any) => {
+  // CKEditor의 onChange 이벤트를 통해 입력된 메시지 업데이트
+  const handleEditorChange = (event: any, editor: any) => {
     const data = editor.getData(); // CKEditor의 데이터를 가져옴
     setNewMessage(data); // 입력된 데이터를 newMessage 상태로 업데이트
   };
@@ -482,7 +477,7 @@ export default function Home1() {
 
                   </div>
                   <div className="chat-messages-footer">
-                  <form onSubmit={sendMessage} className="chat-messages-form flex mt-4">
+                    <form onSubmit={sendMessage} className="chat-messages-form flex mt-4">
                       <div className="chat-messages-form-controls flex-grow">
                         {/* 이모지 선택 버튼 */}
                         <button
@@ -500,18 +495,18 @@ export default function Home1() {
                           </div>
                         )}
 
-                         {/* ClassicEditor 적용 */}
-                         <CKEditor
-                            editor={ClassicEditor}
-                            data={newMessage}
-                            onChange={handleEditorChange}
-                            config={{
-                              ckfinder: {
-                                uploadUrl: 'http://localhost:8081/api/chats/uploads',
-                              },
-                              placeholder: '메시지를 입력하세요...',
-                            }}
-                          />
+                        {/* ClassicEditor 적용 */}
+                        <CKEditor
+                          editor={ClassicEditor}
+                          data={newMessage}
+                          onChange={handleEditorChange}
+                          config={{
+                            ckfinder: {
+                              uploadUrl: 'http://localhost:8081/api/chats/uploads',
+                            },
+                            placeholder: '메시지를 입력하세요...',
+                          }}
+                        />
                       </div>
                       <button
                         type="submit"

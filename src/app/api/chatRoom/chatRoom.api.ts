@@ -37,7 +37,7 @@ export const fetchChatRoomCount = async () => {
 
 export const fetchChatRoomById = async (chatRoomId: any) => {
   const response = await fetch(`http://localhost:8081/api/chatRoom/${chatRoomId}`, {
-    method: 'POST',
+    method: 'GET',
     headers: {
       'Authorization': token ? `Bearer ${token}` : '', // JWT 토큰을 Bearer 형식으로 추가
       'Content-Type': 'application/json',
