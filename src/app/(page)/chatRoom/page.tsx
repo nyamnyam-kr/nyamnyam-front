@@ -3,15 +3,17 @@
 import Head from "next/head";
 import Link from "next/link";
 import Image from 'next/image';
-import { useRouter } from "next/navigation"; // 이 라인은 이제 필요 없을 수 있습니다.
 import { useEffect, useState } from "react";
-import { deleteChatRoomsService, getChatRoomData, getChatRoomDetails, insertChatRoom } from "src/app/service/chatRoom/chatRoom.api";
-import { sendMessageService, subscribeMessages } from "src/app/service/chat/chat.api";
+import { deleteChatRoomsService, getChatRoomData, getChatRoomDetails, insertChatRoom } from "src/app/service/chatRoom/chatRoom.service";
+import { sendMessageService, subscribeMessages } from "src/app/service/chat/chat.service";
 import { ChatRoomModel } from "src/app/model/chatRoom.model";
 import { ChatModel } from "src/app/model/chat.model";
 import { getNotReadParticipantsCount, getUnreadCount, markMessageAsRead, updateReadBy } from "src/app/api/chat/chat.api";
 import dynamic from "next/dynamic"; // Next.js의 dynamic import 사용
 import EmojiPicker from "src/app/components/EmojiPicker";
+import ClassicEditor from "@ckeditor/ckeditor5-build-classic";
+import { CKEditor } from "@ckeditor/ckeditor5-react";
+import axios from "axios";
 
 export default function Home1() {
   const [chatRooms, setChatRooms] = useState<ChatRoomModel[]>([]);
@@ -41,6 +43,7 @@ export default function Home1() {
   });
   const [newParticipantName, setNewParticipantName] = useState<string>(""); // 입력받은 참가자 이름
   const [readBy, setReadBy] = useState<{ [key: string]: boolean }>({}); // 메시지 읽음 상태 관리
+  const [files, setFiles] = useState([]); // 업로드할 파일을 관리하는 상
 
   useEffect(() => {
     const storedUser = localStorage.getItem('user');
@@ -147,6 +150,8 @@ export default function Home1() {
                       : room
                   )
                 );
+                // 다른 클라이언트에서도 unreadCount를 업데이트하도록 로직 추가
+                updateUnreadCount(newMessage);
               })
               .catch((error) => console.error('Failed to mark message as read:', error));
           }
@@ -167,8 +172,17 @@ export default function Home1() {
     };
   }, [selectedChatRoomId]);
 
+  const updateUnreadCount = (message: ChatModel) => {
+    setChatRooms((prevChatRooms) =>
+      prevChatRooms.map((room) =>
+        room.id === selectedChatRoomId
+          ? { ...room, unreadCount: Math.max(room.unreadCount - 1, 0) }
+          : room
+      )
+    );
+  };
 
-
+  
   // 메시지 전송 함수
   // sendMessage 함수에서 새로운 메시지를 보낼 때 호출
   const sendMessage = async (e: React.FormEvent) => {
@@ -178,6 +192,7 @@ export default function Home1() {
       sender,
       message: newMessage,
       readBy: { [sender]: true }, // 보낸 사용자의 읽음 상태 추가
+      files
     };
 
     try {
@@ -187,10 +202,18 @@ export default function Home1() {
         return messageExists ? prevMessages : [...prevMessages, sentMessage];
       });
       setNewMessage("");
+      setFiles([]); // 메시지 전송 후 파일 초기화
     } catch (error) {
       console.error(error);
       alert('메시지 전송 중 오류가 발생했습니다.'); // 사용자에게 알림
     }
+  };
+
+  
+   // CKEditor의 onChange 이벤트를 통해 입력된 메시지 업데이트
+   const handleEditorChange = (event: any, editor: any) => {
+    const data = editor.getData(); // CKEditor의 데이터를 가져옴
+    setNewMessage(data); // 입력된 데이터를 newMessage 상태로 업데이트
   };
 
   const toggleEmojiPicker = () => {
@@ -202,7 +225,7 @@ export default function Home1() {
     setNewMessage((prevMessage) => prevMessage + emoji);
   };
 
-
+ 
 
   const handleDelete = async () => {
     if (selectChatRooms.length === 0) {
@@ -442,6 +465,12 @@ export default function Home1() {
                             <p className="text-sm font-semibold">{msg.sender}</p>
                           </div>
                           <div className="messages-item__text">{msg.message}</div>
+
+                          {/* 이미지 파일 출력 부분 추가 */}
+                          {msg.files && msg.files.map((file, fileIndex) => (
+                            <img key={fileIndex} src={file.url} alt={`Uploaded file ${fileIndex}`} className="w-32 h-32 my-2" />
+                          ))}
+
                           {msg.sender !== sender ? (
                             <div className="messages-item__time text-gray-500 text-xs">{new Date(msg.createdAt).toLocaleTimeString()}</div>
                           ) : (
@@ -456,9 +485,10 @@ export default function Home1() {
                         </div>
                       </div>
                     ))}
+
                   </div>
                   <div className="chat-messages-footer">
-                    <form onSubmit={sendMessage} className="chat-messages-form flex mt-4">
+                  <form onSubmit={sendMessage} className="chat-messages-form flex mt-4">
                       <div className="chat-messages-form-controls flex-grow">
                         {/* 이모지 선택 버튼 */}
                         <button
@@ -476,13 +506,18 @@ export default function Home1() {
                           </div>
                         )}
 
-                        <input
-                          type="text"
-                          value={newMessage}
-                          onChange={(e) => setNewMessage(e.target.value)}
-                          placeholder="메시지를 입력하세요..."
-                          className="message-input-field"
-                        />
+                         {/* ClassicEditor 적용 */}
+                         <CKEditor
+                            editor={ClassicEditor}
+                            data={newMessage}
+                            onChange={handleEditorChange}
+                            config={{
+                              ckfinder: {
+                                uploadUrl: 'http://localhost:8081/api/chats/uploads',
+                              },
+                              placeholder: '메시지를 입력하세요...',
+                            }}
+                          />
                       </div>
                       <button
                         type="submit"

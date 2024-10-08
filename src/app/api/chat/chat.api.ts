@@ -1,7 +1,10 @@
 // /src/app/api/chat/chat.api.ts
+const token = localStorage.getItem('token')
 // 채팅 메시지 스트리밍 API
 export const subscribeToChats = (chatRoomId: any, onMessageReceived: (arg0: any) => void) => {
-  const eventSource = new EventSource(`http://localhost:8081/api/chats/${chatRoomId}`);
+  const eventSource = new EventSource(`http://localhost:8081/api/chats/${chatRoomId}?token=${token}`, {
+
+  });
 
   eventSource.onmessage = (event) => {
     const data = JSON.parse(event.data);
@@ -23,6 +26,7 @@ export const sendChat = async (chatRoomId: any, chat: any) => {
   const response = await fetch(`http://localhost:8081/api/chats/${chatRoomId}`, {
     method: "POST",
     headers: {
+      'Authorization': token ? `Bearer ${token}` : '', // JWT 토큰을 Bearer 형식으로 추가
       "Content-Type": "application/json",
     },
     body: JSON.stringify(chat),
@@ -40,7 +44,13 @@ export const sendChat = async (chatRoomId: any, chat: any) => {
 
 // 채팅방의 읽지 않은 메시지 수를 조회하는 API
 export const getUnreadCount = async (chatRoomId: string, nickname: string): Promise<number> => {
-  const response = await fetch(`http://localhost:8081/api/chats/${chatRoomId}/unreadCount/${nickname}`);
+  const response = await fetch(`http://localhost:8081/api/chats/${chatRoomId}/unreadCount/${nickname}`, {
+    method: "GET",
+    headers: {
+      'Authorization': token ? `Bearer ${token}` : '', // JWT 토큰을 Bearer 형식으로 추가
+      "Content-Type": "application/json",
+    },
+  });
 
   if (!response.ok) {
     const errorResponse = await response.json();
@@ -52,13 +62,19 @@ export const getUnreadCount = async (chatRoomId: string, nickname: string): Prom
 
 // 특정 메시지에서 읽지 않은 참가자 수를 조회하는 API
 export const getNotReadParticipantsCount = async (chatId: string): Promise<number> => {
-  const response = await fetch(`http://localhost:8081/api/chats/${chatId}/notReadParticipantsCount`);
+  const response = await fetch(`http://localhost:8081/api/chats/${chatId}/notReadParticipantsCount`, {
+    method: "GET",
+    headers: {
+      'Authorization': token ? `Bearer ${token}` : '', // JWT 토큰을 Bearer 형식으로 추가
+      "Content-Type": "application/json",
+    },
+  });
 
   if (!response.ok) {
     const errorResponse = await response.json();
     throw new Error(`읽지 않은 참가자 수 조회 실패: ${errorResponse.message || "알 수 없는 오류"}`);
   }
- 
+
   return response.json(); // 읽지 않은 참가자 수를 반환
 };
 
@@ -66,6 +82,10 @@ export const getNotReadParticipantsCount = async (chatId: string): Promise<numbe
 export const markMessageAsRead = async (chatId: string, nickname: string): Promise<any> => {
   const response = await fetch(`http://localhost:8081/api/chats/${chatId}/read/${nickname}`, {
     method: 'PATCH',
+    headers: {
+      'Authorization': token ? `Bearer ${token}` : '', // JWT 토큰을 Bearer 형식으로 추가
+      "Content-Type": "application/json",
+    },
   });
 
   if (!response.ok) {
@@ -81,6 +101,10 @@ export const markMessageAsRead = async (chatId: string, nickname: string): Promi
 export const updateReadBy = async (chatId: string, nickname: string): Promise<any> => {
   const response = await fetch(`http://localhost:8081/api/chats/${chatId}/read/${nickname}`, {
     method: 'PUT', // 새로 추가된 PUT 메서드
+    headers: {
+      'Authorization': token ? `Bearer ${token}` : '', // JWT 토큰을 Bearer 형식으로 추가
+      "Content-Type": "application/json",
+    },
   });
 
   if (!response.ok) {

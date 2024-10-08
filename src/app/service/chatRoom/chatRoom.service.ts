@@ -5,12 +5,13 @@ import { ChatRoomModel } from "src/app/model/chatRoom.model";
 export async function insertChatRoom(chatRoom: ChatRoomModel): Promise<any | { status: number }> {
   try {
 
-
+    const token = localStorage.getItem('token')
     const response = await fetch('http://localhost:8081/api/chatRoom/save', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
+      method: "POST",
+    headers: {
+      'Authorization': token ? `Bearer ${token}` : '', // JWT 토큰을 Bearer 형식으로 추가
+      "Content-Type": "application/json",
+    },
       body: JSON.stringify(chatRoom)
     });
     console.log(chatRoom)
