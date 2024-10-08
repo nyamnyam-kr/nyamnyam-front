@@ -2,26 +2,26 @@
 import React, {useEffect, useState} from "react";
 import {Bar, Doughnut, Line} from "react-chartjs-2";
 import {
-    Chart as ChartJS,
-    Title,
-    Tooltip,
-    Legend,
-    BarElement,
     ArcElement,
+    BarElement,
     CategoryScale,
+    Chart as ChartJS,
+    Legend,
     LinearScale,
-    PointElement, LineElement
+    LineElement,
+    PointElement,
+    Title,
+    Tooltip
 } from "chart.js"; // ArcElement 추가
 import styles from "src/css/mypage.module.css";
-import axios from "axios";
-import Link from "next/link";
 import {
     fetchReceiptList,
     fetchShowArea,
-    fetchShowCount,
-    fetchShowRestaurant
+    fetchShowRestaurant,
+    fetchUpvoteRestaurant
 } from "src/app/service/admin/admin.service";
 import {Area, CountCost, CountItem, RestaurantList} from "src/app/model/dash.model";
+
 
 ChartJS.register(Title, Tooltip, Legend, BarElement, ArcElement, CategoryScale, LinearScale, PointElement, LineElement);
 const DashBoard = () => {
@@ -29,8 +29,7 @@ const DashBoard = () => {
     const [region, setRegion] = useState<Area[]>([]);
     const [restaurant, setRestaurant] = useState<RestaurantList[]>([]);
     const [countRestaurant, setCountRestaurant] = useState<CountCost[]>([]);
-    const [sumList, setSumList] = useState<RestaurantList[]>([]);
-
+    const [upvoteRestaurant, setUpvoteRestaurant] = useState<RestaurantList[]>([]);
 
     useEffect(() => {
         const showArea = async () => {
@@ -56,16 +55,32 @@ const DashBoard = () => {
         countRestaurant();
     }, []);
 
+    useEffect(() => {
+        const restaurant = async () => {
+            const data = await fetchUpvoteRestaurant();
+            setUpvoteRestaurant(data);
+        };
+        restaurant();
+    }, []);
 
 
-    const [content, setContent] = useState("");
-    const userId = 1; // Replace this with the actual user ID
-    const currentDate = new Date().toISOString(); // Adjust format if needed
+
+
 
     const areaData = {
         labels: region.map(item => item.area),
         datasets: [{
             data: region.map(item => item.total),
+            backgroundColor: ["#F46119", "#ed6d2b", "#f37f48", "#ea966d", "#EAB5A0FF"],
+            borderColor: ["#fff", "#fff", "#fff", "#fff", "#fff"],
+            borderWidth: 1,
+        }],
+    };
+
+    const upvoteData = {
+        labels: upvoteRestaurant.map(item => item.restaurantName),
+        datasets: [{
+            data: upvoteRestaurant.map(item => item.total),
             backgroundColor: ["#F46119", "#ed6d2b", "#f37f48", "#ea966d", "#EAB5A0FF"],
             borderColor: ["#fff", "#fff", "#fff", "#fff", "#fff"],
             borderWidth: 1,
@@ -98,13 +113,24 @@ const DashBoard = () => {
         ],
     };
 
+    const role = localStorage.getItem('role');
+
+    if (role !== 'ADMIN') {
+        return (
+            <div className="unauthorized text-center mt-5">
+                <h2>권한이 없습니다</h2>
+                <p>You do not have permission to view this content.</p>
+            </div>
+        );
+    }
+
 
     return (
         <>
             <div className={styles.row}>
                 <div className={styles.col}>
                     <div className={styles.card}>
-                        <div className={styles.cardHeader}>TOTAL POST USER RANKING</div>
+                        <div className={styles.cardHeader}>포스팅이 가장 많은 음식점 랭킹</div>
                         <div className={styles.cardBody}>
                             <div className={styles.chartContainer}>
                                 <Bar
@@ -123,14 +149,13 @@ const DashBoard = () => {
                         </div>
                     </div>
                 </div>
-
                 <div className={styles.col}>
                     <div className={styles.card}>
-                        <div className={styles.cardHeader}>TOTAL POST USER RANKING</div>
+                        <div className={styles.cardHeader}>좋아요를 많이 받은 포스팅의 음식점 랭킹</div>
                         <div className={styles.cardBody}>
                             <div className={styles.chartContainer}>
                                 <Bar
-                                    data={restaurantData}
+                                    data={upvoteData}
                                     options={{
                                         responsive: true,
                                         maintainAspectRatio: false,
@@ -145,9 +170,9 @@ const DashBoard = () => {
                         </div>
                     </div>
                 </div>
-
-
-                <div className={`${styles.col} mb-10`}>
+            </div>
+            <div className={styles.row}>
+                <div className={styles.col}>
                     <div className={styles.card}>
                         <div className={styles.cardHeader}>음식점 많은 지역 랭킹</div>
                         <div className={styles.cardBody}>
@@ -174,13 +199,9 @@ const DashBoard = () => {
                         </div>
                     </div>
                 </div>
-
-            </div>
-
-            <div className={styles.row}>
                 <div className={styles.col}>
                     <div className={styles.card}>
-                        <div className={styles.cardHeader}>포스팅 많은 음식점 랭킹</div>
+                        <div className={styles.cardHeader}>월별 영수증 리뷰 사용 횟수</div>
                         <div className={styles.cardBody}>
                             <div className={styles.chartContainer}>
                                 <Line data={lineData} options={{responsive: true}}/>

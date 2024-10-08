@@ -1,6 +1,7 @@
 export interface ReportModel {
-    userId: number;
+    userId: string;
     postId: number;
     reason: string;
+    entryDate: string;
 
 }
