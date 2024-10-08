@@ -18,9 +18,9 @@ export async function insertChatRoom(chatRoom: ChatRoomModel): Promise<any | { s
 
 
     if (!response.ok) {
-      const errorData = await response.json(); // 오류 메시지 확인
+      const errorData = await response.json();
       console.error('Error response:', errorData);
-      return { status: response.status }; // 상태 코드 반환
+      return { status: response.status };
     }
 
     const data = await response.json();

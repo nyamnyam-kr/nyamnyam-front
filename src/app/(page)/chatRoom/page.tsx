@@ -48,11 +48,12 @@ export default function Home1() {
   useEffect(() => {
     const nickname = localStorage.getItem('nickname');
     if (nickname) {
-      
+
       setSender(nickname); // 로그인된 사용자의 닉네임으로 sender 초기화
       fetchData(nickname);
     }
   }, []);
+
 
   const fetchData = async (nickname: string) => {
     if (!nickname) return;
@@ -181,7 +182,7 @@ export default function Home1() {
     );
   };
 
-  
+
   // 메시지 전송 함수
   // sendMessage 함수에서 새로운 메시지를 보낼 때 호출
   const sendMessage = async (e: React.FormEvent) => {
@@ -208,7 +209,7 @@ export default function Home1() {
     }
   };
 
-  
+
    // CKEditor의 onChange 이벤트를 통해 입력된 메시지 업데이트
    const handleEditorChange = (event: any, editor: any) => {
     const data = editor.getData(); // CKEditor의 데이터를 가져옴
@@ -224,7 +225,7 @@ export default function Home1() {
     setNewMessage((prevMessage) => prevMessage + emoji);
   };
 
- 
+
 
   const handleDelete = async () => {
     if (selectChatRooms.length === 0) {
@@ -464,12 +465,6 @@ export default function Home1() {
                             <p className="text-sm font-semibold">{msg.sender}</p>
                           </div>
                           <div className="messages-item__text">{msg.message}</div>
-
-                          {/* 이미지 파일 출력 부분 추가 */}
-                          {msg.files && msg.files.map((file, fileIndex) => (
-                            <img key={fileIndex} src={file.url} alt={`Uploaded file ${fileIndex}`} className="w-32 h-32 my-2" />
-                          ))}
-
                           {msg.sender !== sender ? (
                             <div className="messages-item__time text-gray-500 text-xs">{new Date(msg.createdAt).toLocaleTimeString()}</div>
                           ) : (
