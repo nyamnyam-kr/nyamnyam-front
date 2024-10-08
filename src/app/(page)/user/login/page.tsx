@@ -5,6 +5,7 @@ import Link from "next/link";
 import * as Icon from "@phosphor-icons/react/dist/ssr";
 import { jwtDecode } from 'jwt-decode';
 import nookies from 'nookies';
+
 import {authenticateUser} from "@/app/service/user/user.service";
 
 interface DecodedToken {
@@ -37,6 +38,7 @@ export default function Home() {
             localStorage.setItem('nickname', decoded.nickname);
             localStorage.setItem('username', decoded.username);
             localStorage.setItem('role', decoded.role);
+            
 
             // 홈 페이지로 이동
             router.push("/");
