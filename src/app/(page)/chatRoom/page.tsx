@@ -42,14 +42,13 @@ export default function Home1() {
   const [readBy, setReadBy] = useState<{ [key: string]: boolean }>({}); // 메시지 읽음 상태 관리
 
   useEffect(() => {
-    const storedUser = localStorage.getItem('user');
-    if (storedUser) {
-      const parsedUser = JSON.parse(storedUser);
-      setUser(parsedUser);
-      setSender(parsedUser.nickname); // 로그인된 사용자의 닉네임으로 sender 초기화
-      fetchData(parsedUser.nickname);
+    const nickname = localStorage.getItem('nickname'); // nickname만 가져옴
+    if (nickname) {
+      setSender(nickname); // sender에 nickname 설정
+      fetchData(nickname); // nickname으로 데이터 가져오기
     }
   }, []);
+
 
   const fetchData = async (nickname: string) => {
     if (!nickname) return;
@@ -463,7 +462,7 @@ export default function Home1() {
                       >
                         Send
                       </button>
-                    </form>  
+                    </form>
                   </div>
                 </>
               ) : null}

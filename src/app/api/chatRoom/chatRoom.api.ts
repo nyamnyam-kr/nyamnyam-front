@@ -1,7 +1,9 @@
 // /src/app/api/chatRoom/chatRoom.api.ts
 // 챗룸 출력(해당 유저가 참여한으로 수정 필요)
+import {customFetch} from "@/app/service/user/fetchClient";
+
 export const fetchChatRooms = async (nickname:any) => {
-  const response = await fetch(`http://localhost:8081/api/chatRoom/findAll/${nickname}`, {
+  const response = await customFetch(`http://localhost:8081/api/chatRoom/findAll/${nickname}`, {
     method: 'GET',
     headers: {
       'Content-Type': 'application/json',
