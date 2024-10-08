@@ -1,44 +1,29 @@
 // src/app/service/user.service.ts
 import { User } from "src/app/model/user.model";
-import {
-    fetchUserExists,
-    fetchUserById,
-    fetchAllUsers,
-    fetchUserCount,
-    deleteUserById,
-    updateUser,
-    registerUser,
-    loginUser, uploadThumbnailApi,
-} from "src/app/api/user/user.api";
+import { UserApi } from "src/app/api/user/user.api";
 
-// 사용자 존재 여부 확인 서비스
 export const checkUserExists = async (id: string): Promise<boolean> => {
-    return await fetchUserExists(id);
+    return await UserApi.fetchUserExists(id);
 };
 
-// 사용자 정보 가져오기 서비스
 export const getUserById = async (id: string): Promise<User> => {
-    return await fetchUserById(id);
+    return await UserApi.fetchUserById(id);
 };
 
-// 모든 사용자 가져오기 서비스
 export const getAllUsers = async (): Promise<User[]> => {
-    return await fetchAllUsers();
+    return await UserApi.fetchAllUsers();
 };
 
-// 사용자 수 가져오기 서비스
 export const getUserCount = async (): Promise<number> => {
-    return await fetchUserCount();
+    return await UserApi.fetchUserCount();
 };
 
-// 사용자 삭제 서비스
 export const removeUserById = async (id: string): Promise<void> => {
-    await deleteUserById(id);
+    await UserApi.deleteUserById(id);
 };
 
-// 사용자 정보 업데이트 서비스
 export const modifyUser = async (user: User): Promise<User> => {
-    return await updateUser(user);
+    return await UserApi.updateUser(user);
 };
 
 export const addUser = async (
@@ -65,22 +50,32 @@ export const addUser = async (
         imgId: null,
     };
 
-    if (thumbnails.length > 0) {
-        try {
-            const imgIds = await uploadThumbnailApi(thumbnails);
+    thumbnails.length > 0 &&
+    (await UserApi.uploadThumbnailApi(thumbnails)
+        .then(imgIds => {
             user.imgId = imgIds.length > 0 ? imgIds[0].toString() : null;
-        } catch (error) {
+        })
+        .catch(error => {
             console.error('Thumbnail upload failed:', error);
-        }
-    }
+        }));
 
-    return await registerUser(user,thumbnails);
+    return await UserApi.registerUser(user, thumbnails);
 };
 
 
-// 사용자 로그인 서비스
 export const authenticateUser = async (username: string, password: string): Promise<string> => {
-    return await loginUser(username, password);
+    return await UserApi.loginUser(username, password);
 };
 
+export const refreshUserToken = async (oldToken: string): Promise<string> => {
+    return await UserApi.refreshTokenApi(oldToken);
+};
+
+export const logoutUser = async (): Promise<void> => {
+    await UserApi.logoutApi();
+};
+
+export const checkUsernameExists = async (username: string): Promise<boolean> => {
+    return await UserApi.checkUsernameExists(username);
+};
 

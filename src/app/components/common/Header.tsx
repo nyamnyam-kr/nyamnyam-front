@@ -6,13 +6,14 @@ import * as Icon from "@phosphor-icons/react/dist/ssr";
 import { useModalWishlistContext } from 'src/app/context/ModalWishlistContext';
 import { useRouter } from 'next/navigation';
 import nookies from "nookies";
+import {logoutUser} from "@/app/service/user/user.service";
 
 interface User {
   nickname: string;
   username: string;
   role: string;
   token: string;
-  userId: string; // 추가된 userId 필드
+  userId: string;
 }
 
 export default function Header() {
@@ -40,17 +41,23 @@ export default function Header() {
     }
   }, []);
 
-  const handleLogout = () => {
-    localStorage.removeItem('token');
-    localStorage.removeItem('username');
-    localStorage.removeItem('nickname');
-    localStorage.removeItem('role');
+  const handleLogout = async () => {
+    try {
+      await logoutUser();
 
-    nookies.destroy(null, 'userId', { path: '/' });
+      localStorage.removeItem('token');
+      localStorage.removeItem('username');
+      localStorage.removeItem('nickname');
+      localStorage.removeItem('role');
 
-    setUser(null);
-    router.push('/');
+      nookies.destroy(null, 'userId', { path: '/' });
+      setUser(null);
+      router.push('/');
+    } catch (error) {
+      console.error('Logout failed:', error);
+    }
   };
+
 
   const handleOpenModal = () => {
     console.log("Opening Modal");
@@ -79,7 +86,7 @@ export default function Header() {
                   <>
                     <div>
                       <Link href="/tag/tags" className="action-btn">
-                        {user.nickname || user.username}
+                        {user.nickname}
                       </Link>
                     </div>
                     <button onClick={handleLogout} className="action-btn">

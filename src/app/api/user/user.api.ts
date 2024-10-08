@@ -1,7 +1,9 @@
 
 import { User } from "src/app/model/user.model";
+import {customFetch} from "@/app/service/user/fetchClient";
 
-export const fetchUserExists = async (id: string): Promise<boolean> => {
+
+const fetchUserExists = async (id: string): Promise<boolean> => {
     const response = await fetch(`http://localhost:8081/api/user/existsById?id=${id}`);
     if (!response.ok) {
         throw new Error('Failed to fetch user existence');
@@ -9,7 +11,7 @@ export const fetchUserExists = async (id: string): Promise<boolean> => {
     return response.json();
 };
 
-export const fetchUserById = async (id: string): Promise<User> => {
+const fetchUserById = async (id: string): Promise<User> => {
     const response = await fetch(`http://localhost:8081/api/user/findById?id=${id}`);
     if (!response.ok) {
         throw new Error('Failed to fetch user by ID');
@@ -17,7 +19,7 @@ export const fetchUserById = async (id: string): Promise<User> => {
     return response.json();
 };
 
-export const fetchAllUsers = async (): Promise<User[]> => {
+const fetchAllUsers = async (): Promise<User[]> => {
     const response = await fetch(`http://localhost:8081/api/user/findAll`);
     if (!response.ok) {
         throw new Error('Failed to fetch all users');
@@ -25,7 +27,7 @@ export const fetchAllUsers = async (): Promise<User[]> => {
     return response.json();
 };
 
-export const fetchUserCount = async (): Promise<number> => {
+const fetchUserCount = async (): Promise<number> => {
     const response = await fetch(`http://localhost:8081/api/user/count`);
     if (!response.ok) {
         throw new Error('Failed to fetch user count');
@@ -33,7 +35,7 @@ export const fetchUserCount = async (): Promise<number> => {
     return response.json();
 };
 
-export const deleteUserById = async (id: string): Promise<void> => {
+const deleteUserById = async (id: string): Promise<void> => {
     const response = await fetch(`http://localhost:8081/api/user/deleteById?id=${id}`, {
         method: 'DELETE',
     });
@@ -42,7 +44,7 @@ export const deleteUserById = async (id: string): Promise<void> => {
     }
 };
 
-export const updateUser = async (user: User): Promise<User> => {
+const updateUser = async (user: User): Promise<User> => {
     const response = await fetch(`http://localhost:8081/api/user/update`, {
         method: 'PUT',
         headers: {
@@ -56,7 +58,7 @@ export const updateUser = async (user: User): Promise<User> => {
     return response.json();
 };
 
-export const registerUser = async (user: User, thumbnails: File[]): Promise<User> => {
+const registerUser = async (user: User, thumbnails: File[]): Promise<User> => {
     const formData = new FormData();
     formData.append('user', new Blob([JSON.stringify(user)], { type: 'application/json' }));
 
@@ -77,7 +79,7 @@ export const registerUser = async (user: User, thumbnails: File[]): Promise<User
 
 
 
-export const loginUser = async (username: string, password: string): Promise<string> => {
+const loginUser = async (username: string, password: string): Promise<string> => {
     const response = await fetch(`http://localhost:8081/api/user/login?username=${username}&password=${password}`, {
         method: 'POST',
     });
@@ -95,7 +97,7 @@ export const loginUser = async (username: string, password: string): Promise<str
         return response.text();
     }
 };
-export const uploadThumbnailApi = async (thumbnails: File[]): Promise<number[]> => {
+const uploadThumbnailApi = async (thumbnails: File[]): Promise<number[]> => {
     const formData = new FormData();
     thumbnails.forEach(thumbnail => {
         formData.append('images', thumbnail);
@@ -113,4 +115,57 @@ export const uploadThumbnailApi = async (thumbnails: File[]): Promise<number[]> 
     const data = await response.json();
     return data.imgIds;
 };
+
+const refreshTokenApi = async (oldToken: string): Promise<string> => {
+    const response = await fetch(`http://localhost:8081/api/token/refresh`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ oldToken }),
+    });
+
+    if (!response.ok) {
+        throw new Error('Failed to refresh token');
+    }
+
+    const data = await response.json();
+    return data;
+};
+
+// logoutApi에서 customFetch 사용
+export const logoutApi = async (): Promise<void> => {
+    const token = localStorage.getItem('token'); // localStorage에서 토큰 가져오기
+
+    // 로그아웃 요청을 customFetch를 통해 호출
+    await customFetch(`http://localhost:8081/api/token/logout`, {
+        method: 'POST',
+        body: JSON.stringify({ token }), // 바디에 토큰을 포함하여 전달
+    });
+};
+
+
+const checkUsernameExists = async (username: string): Promise<boolean> => {
+    const response = await fetch(`http://localhost:8081/api/user/check-username?username=${username}`);
+    if (!response.ok) {
+        throw new Error('Failed to check username existence');
+    }
+    return response.json();
+};
+
+export const UserApi = {
+    fetchUserExists,
+    fetchUserById,
+    fetchAllUsers,
+    fetchUserCount,
+    deleteUserById,
+    updateUser,
+    registerUser,
+    loginUser,
+    uploadThumbnailApi,
+    refreshTokenApi,
+    logoutApi,
+    checkUsernameExists
+};
+
 

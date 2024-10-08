@@ -27,6 +27,7 @@ export default function Home() {
         try {
             const token = await authenticateUser(username, password);
 
+            console.log('Token:', token);
 
             const decoded: DecodedToken = jwtDecode<DecodedToken>(token);
 
@@ -37,6 +38,7 @@ export default function Home() {
             localStorage.setItem('username', decoded.username);
             localStorage.setItem('role', decoded.role);
 
+            // 홈 페이지로 이동
             router.push("/");
         } catch (error) {
             console.error('Login failed:', error);
