@@ -12,13 +12,13 @@ const getByRestaurant = async (restaurantId: number) => {
     return response.data;
 };
 
-const insert = async (postData: Partial<PostModel>): Promise<number> => {
-  const response = await strategy.POST(api.post, postData); // 고정경로
+const insert = async (formData: FormData): Promise<number> => {
+  const response = await strategy.POST_MULTIPART(`${api.post}`, formData);
   return response.data;
 };
 
-const update = async (id: number, postData: any): Promise<PostModel> => {
-  const response = await strategy.PUT(`${api.post}/${id}`, postData);
+const update = async (formData: FormData): Promise<number> => {
+  const response = await strategy.PUT_MULTIPART(`${api.post}`, formData);
   return response.data;
 };
 
@@ -26,4 +26,12 @@ const remove = async (postId: number) => {
     const response = await strategy.DELETE(`${api.post}/${postId}`);
     return response;
 };
-export const post = { getById, getByRestaurant, insert, update, remove };
+
+const listById = async (userId:string) => {
+    const response = await strategy.GET(`${api.post}/list/${userId}`);
+    return response.data;
+
+}
+
+export const post = { getById, getByRestaurant, insert, update, remove, listById };
+

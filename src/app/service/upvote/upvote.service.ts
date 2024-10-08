@@ -1,19 +1,18 @@
 import { upvote } from "src/app/api/upvote/upvote.api";
 import { initialUpvote, UpvoteModel } from "src/app/model/upvote.model";
 
-export const checkLikedService = async (postId: number, userId: number) => {
+const check = async (postId: number, userId: string) => {
     const upvoteData: UpvoteModel = {
         ...initialUpvote,
         giveId: userId,
         postId, 
-        haveId: 0
     }
     return await upvote.hasLiked(upvoteData);
 };
 
-export const toggleLikeService = async ( postId: number,userId: number,likedPost: number[]
+const toggle = async ( postId: number,userId: string, likedPost: number[]
   ): Promise<{ likedPost: number[]; likeCountDelta: number }> => {
-    const upvoteData: UpvoteModel = { id: 0, giveId: userId, postId, haveId: 0 };
+    const upvoteData: UpvoteModel = { id: 0, giveId: userId, postId};
 
     if (likedPost.includes(postId)) {
         const success = await upvote.unLike(upvoteData);
@@ -27,3 +26,5 @@ export const toggleLikeService = async ( postId: number,userId: number,likedPost
           : { likedPost, likeCountDelta: 0 };
       }
     };
+
+export const upvoteService = {check, toggle};

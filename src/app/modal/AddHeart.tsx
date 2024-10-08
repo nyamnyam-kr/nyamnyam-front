@@ -1,8 +1,11 @@
 import { useState, useEffect } from 'react';
-import Modal from './Modal'; // Modal 컴포넌트 임포트
+import Modal from '../components/Modal'; // Modal 컴포넌트 임포트
+import { fetchWishListsService } from '../service/wishList/wishList.service';
+import nookies from 'nookies';
 
 interface HeartButtonProps {
     restaurantId: number | undefined;
+    userId: number;
 }
 
 const HeartButton = ({ restaurantId }: HeartButtonProps) => {
@@ -12,11 +15,18 @@ const HeartButton = ({ restaurantId }: HeartButtonProps) => {
     const [isAddModalOpen, setIsAddModalOpen] = useState(false); // 추가 모달 상태
     const [newWishListName, setNewWishListName] = useState('');
     const [message, setMessage] = useState<string | null>(null);
-    const userId = 4;
+    // const userId = 1;
+    const cookies = nookies.get();
+    const userId = cookies.userId;
 
     useEffect(() => {
+
         const fetchFavoritedRestaurants = async () => {
+
             try {
+
+
+
                 // 유저가 가지고 있는 모든 위시리스트의 모든 식당 가져와서 DB에 마운트된 전체 식당과 같은 아이디의 식당이 있으면 해당 식당은 하트 처리
                 const response = await fetch(`http://localhost:8080/api/wishList/getAll`, {
                     method: 'GET',
@@ -43,13 +53,28 @@ const HeartButton = ({ restaurantId }: HeartButtonProps) => {
         fetchFavoritedRestaurants();
     }, [restaurantId]);
 
+    // useEffect(() => {
+    //     const fetchFavoritedRestaurants = async () => {
+    //         try {
+    //             const wishListData = await fetchWishListsService(userId); 
+    //             const isFavorited = wishListData.data
+    //             setIsFavorited(isFavorited);
+    //         } catch (error) {
+    //             console.error('Error fetching favorited restaurants:', error);
+    //         }
+    //     };
 
+    //     fetchFavoritedRestaurants();
+    // }, [restaurantId]);
 
 
     const handleToggleFavorite = async (event: React.MouseEvent) => {
         event.stopPropagation();
         const newFavoritedState = !isFavorited;
         //setIsFavorited(newFavoritedState);
+
+
+
 
         try {
             if (newFavoritedState) {
@@ -74,10 +99,10 @@ const HeartButton = ({ restaurantId }: HeartButtonProps) => {
                     method: 'DELETE',
                     headers: {
                         'Content-Type': 'application/json',
-                        'userId': userId.toString(), 
+                        'userId': userId.toString(),
                     },
                 });
-    
+
                 if (!deleteResponse.ok) {
                     console.log('위시리스트에서 삭제 실패');
                 } else {
@@ -85,8 +110,8 @@ const HeartButton = ({ restaurantId }: HeartButtonProps) => {
                     setIsFavorited(false);
                 }
             }
-            
-            
+
+
 
         } catch (error) {
             console.error('Error fetching wish list:', error);
@@ -106,7 +131,7 @@ const HeartButton = ({ restaurantId }: HeartButtonProps) => {
                     'Content-Type': 'application/json',
                     'userId': userId.toString(),
                 },
-         
+
             });
 
             if (!response.ok) {
@@ -142,8 +167,8 @@ const HeartButton = ({ restaurantId }: HeartButtonProps) => {
             const addedWishListName = wishList.find(item => item.id === wishListId)?.name;
             console.log('식당이 추가되었습니다:', newRestaurant);
             setMessage(`식당이 ${addedWishListName} 에 추가되었습니다!`);
-            
-            setIsFavorited(true); 
+
+            setIsFavorited(true);
 
             setTimeout(() => {
                 setMessage(null);
@@ -173,7 +198,7 @@ const HeartButton = ({ restaurantId }: HeartButtonProps) => {
                         <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" />
                     </svg>
                 ) : (
-                    <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8 text-white" fill="currentColor" viewBox="0 0 24 24">
+                    <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8 text-white" fill="currentColor" stroke="none" viewBox="0 0 24 24">
                         <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" />
                     </svg>
                 )}
@@ -189,7 +214,7 @@ const HeartButton = ({ restaurantId }: HeartButtonProps) => {
                     <ul className="space-y-4">
                         {wishList.map((item) => (
                             <button key={item.id} onClick={() => handleAddRestaurantToWishList(item.id)} className="text-green-500">
-                                <li className="flex justify-between items-center p-4 border rounded-lg shadow-sm" style={{marginLeft:'10%'}}>
+                                <li className="flex justify-between items-center p-4 border rounded-lg shadow-sm" style={{ marginLeft: '10%' }}>
                                     <div>
                                         <h3 className="text-lg font-semibold">{item.name}   +</h3>
                                     </div>

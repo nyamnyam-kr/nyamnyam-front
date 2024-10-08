@@ -1,10 +1,10 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { ChangeEvent, FormEvent, useEffect, useState } from "react";
-import {tag} from "src/app/api/tag/tag.api";
+import React, { ChangeEvent, FormEvent, useEffect, useState } from "react";
+import { tag } from "src/app/api/tag/tag.api";
 import { initialTag, TagModel } from "src/app/model/tag.model";
-import { insertTagService } from "src/app/service/tag/tag.service";
+import { tagService } from "src/app/service/tag/tag.service";
 
 export default function TagRegister() {
   const router = useRouter();
@@ -16,13 +16,13 @@ export default function TagRegister() {
   }, []); 
 
   const fetchTagCategory = async () => {
-    const data = await tag.getCategoryNames();
+    const data = await tag.getCategoryNames(); 
     setTagCategory(data);
   }
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
-    await insertTagService(formData); 
+    await tagService.insert(formData); 
     router.push('/tag/tags'); 
   };
 
@@ -34,8 +34,19 @@ export default function TagRegister() {
     });
   };
 
+  const role = localStorage.getItem('role');
+
+  if (role !== 'ADMIN') {
+    return (
+        <div className="unauthorized text-center mt-5">
+          <h2>권한이 없습니다</h2>
+          <p>You do not have permission to view this content.</p>
+        </div>
+    );
+  }
+
   return (
-    <main className="flex min-h-screen flex-col items-center">
+    <main className="flex min-h-screen flex-col items-center" style={{ marginTop: '30px' }}>
       <h1>[태그 등록]</h1>
       <form onSubmit={handleSubmit} className="space-y-4 p-4">
       <div>
@@ -68,7 +79,7 @@ export default function TagRegister() {
 
         <button
           type="submit"
-          className="bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500"
+          className="bg-transparent hover:bg-gray-200 text-gray-700 font-semibold py-2 px-4 border border-gray-300 rounded mr-2"
         >
           등록하기
         </button>

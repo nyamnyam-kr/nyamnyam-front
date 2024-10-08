@@ -2,12 +2,12 @@
 import { tag } from "src/app/api/tag/tag.api";
 import { TagModel } from "src/app/model/tag.model";
 
-export const insertTagService = async (formData:TagModel) => {
+const insert = async (formData:TagModel) => {
   const data = await tag.insert(formData); 
   return data; 
 }
 
-export const deleteTagService = async (name: string, tags: { [category: string]: TagModel[] }) => {
+const remove = async (name: string, tags: { [category: string]: TagModel[] }) => {
   try {
     await tag.remove(name);
 
@@ -26,10 +26,9 @@ export const deleteTagService = async (name: string, tags: { [category: string]:
   }
 };
 
-export const fetchTagData = async (): Promise<{ [category: string]: TagModel[] }> => {
+const fetchTag = async (): Promise<{ [category: string]: TagModel[] }> => {
   try {
     const tags = await tag.getByCategories();
-    console.log("fetchTagData에서 받은 tags (Object 형태):", tags);
 
     if (!tags || Object.keys(tags).length === 0) { // 데이터를 배열로 변환
       console.error("태그 데이터가 비어 있습니다.");
@@ -42,8 +41,6 @@ export const fetchTagData = async (): Promise<{ [category: string]: TagModel[] }
         categorizedTags[category] = tagList;
       }
     });
-
-    console.log("Categorized Tags:", categorizedTags);
     return categorizedTags;
   } catch (error) {
     console.error("Error in fetchTagsData:", error);
@@ -51,3 +48,4 @@ export const fetchTagData = async (): Promise<{ [category: string]: TagModel[] }
   }
 };
 
+export const tagService = {insert, remove, fetchTag};

@@ -13,7 +13,8 @@ import dynamic from "next/dynamic"; // Next.js의 dynamic import 사용
 import EmojiPicker from "src/app/components/EmojiPicker";
 import ClassicEditor from "@ckeditor/ckeditor5-build-classic";
 import { CKEditor } from "@ckeditor/ckeditor5-react";
-import axios from "axios";
+import React from 'react';
+
 
 export default function Home1() {
   const [chatRooms, setChatRooms] = useState<ChatRoomModel[]>([]);
@@ -33,10 +34,9 @@ export default function Home1() {
   const [chatRoomName, setChatRoomName] = useState<string>(""); // 채팅방 이름
   const [participantNames, setParticipantNames] = useState<string[]>(() => {
     if (typeof window !== 'undefined') {
-      const storedUser = localStorage.getItem('user');
-      if (storedUser) {
-        const parsedUser = JSON.parse(storedUser);
-        return [parsedUser.nickname];
+      const nickname = localStorage.getItem('nickname');
+      if (nickname) {
+        return [nickname];
       }
     }
     return [];
@@ -46,12 +46,11 @@ export default function Home1() {
   const [files, setFiles] = useState([]); // 업로드할 파일을 관리하는 상
 
   useEffect(() => {
-    const storedUser = localStorage.getItem('user');
-    if (storedUser) {
-      const parsedUser = JSON.parse(storedUser);
-      setUser(parsedUser);
-      setSender(parsedUser.nickname); // 로그인된 사용자의 닉네임으로 sender 초기화
-      fetchData(parsedUser.nickname);
+    const nickname = localStorage.getItem('nickname');
+    if (nickname) {
+      
+      setSender(nickname); // 로그인된 사용자의 닉네임으로 sender 초기화
+      fetchData(nickname);
     }
   }, []);
 

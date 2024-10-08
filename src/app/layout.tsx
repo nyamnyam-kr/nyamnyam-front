@@ -1,20 +1,19 @@
 // src/app/(page)/restaurant/layout.tsx 또는 src/app/layout.tsx
-
+"use client"
 import React from 'react';
 import Header from 'src/app/components/common/Header';
-import StoreProvider from 'src/app/StoreProvider';
-import { SearchProvider } from './components/SearchContext';
-import { ModalWishlistProvider } from './context/ModalWishlistContext';
-
-import { WishlistProvider } from './context/WishlistContext';
 import ModalWishlist from './modal/ModalWishlist';
 import GlobalProvider from './GlobalProvider';
 
+import '@/styles/styles.scss'
+
+
+
 export default function RootLayout({
-  children,
-}: Readonly<{ children: React.ReactNode }>) {
+                                     children,
+                                   }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html lang="en">
+      <html lang="en">
       <head>
         <meta charSet="utf-8" />
         <title>NyamNyam</title>
@@ -35,21 +34,21 @@ export default function RootLayout({
         <link href="https://fonts.googleapis.com/css2?family=Marcellus&display=swap" rel="stylesheet" />
       </head>
       <body>
-        {/* <SearchProvider>
+      {/* <SearchProvider>
           <WishlistProvider>
             <ModalWishlistProvider>
-              <Header />
+              <Header />  
               <ModalWishlist />
               <main style={{ padding: '5%', overflow: 'hidden' }}>{children}</main>
             </ModalWishlistProvider>
           </WishlistProvider>
         </SearchProvider> */}
-        <GlobalProvider>
-          <Header />
-          <main style={{ padding: '5%', overflow: 'hidden' }}>{children}</main>
-          <ModalWishlist />
-        </GlobalProvider>
+      <GlobalProvider>
+        <Header />
+        <main style={{ padding: '5%', overflow: 'hidden' }}>{children}</main>
+        <ModalWishlist />
+      </GlobalProvider>
       </body>
-    </html>
+      </html>
   );
 }
