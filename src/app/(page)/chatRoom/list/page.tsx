@@ -1,5 +1,6 @@
 "use client";
 
+import { ChatRoomModel } from "@/app/model/chatRoom.model";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
