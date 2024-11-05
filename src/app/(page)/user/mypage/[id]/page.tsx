@@ -1,91 +1,108 @@
 "use client";
 import React, {useEffect, useState} from "react";
-import {fetchInsertOpinion} from "src/app/service/opinion/opinion.serivce";
+import {fetchInsertOpinion} from "@/app/service/opinion/opinion.serivce";
 import Image from 'next/image'
 import Link from "next/link";
 import * as Icon from "@phosphor-icons/react/dist/ssr";
-import {fetchShowArea, fetchShowCount} from "src/app/service/admin/admin.service";
-import {Area, CountItem, RestaurantList, UserPostModel} from "src/app/model/dash.model";
-import {OpinionModel} from "src/app/model/opinion.model";
+import {fetchShowCount} from "@/app/service/admin/admin.service";
+import {fetchShowFollower, fetchShowFollowing} from "@/app/service/follow/follow.service";
+import {Area, CountItem, RestaurantList, UserPostModel} from "@/app/model/dash.model";
+import {OpinionModel} from "@/app/model/opinion.model";
 import {ArcElement, BarElement, CategoryScale, Chart as ChartJS, Legend, LinearScale, Title, Tooltip} from "chart.js";
-import styles from "src/css/mypage.module.css";
+import styles from "@/css/mypage.module.css";
 import {Bar, Doughnut} from "react-chartjs-2";
-import MyCalendar from "src/app/(page)/user/calendar/[id]/page";
-import MyWallet from "src/app/(page)/user/wallet/[id]/page";
+import MyCalendar from "@/app/(page)/user/calendar/[id]/page";
+import MyWallet from "@/app/(page)/user/wallet/[id]/page";
 import nookies from "nookies";
 import {fetchPostList} from "@/app/service/post/post.service";
+import {useSearchContext} from "@/app/components/SearchContext";
+import {usePathname, useRouter} from "next/navigation";
+import UserDash from "@/app/(page)/user/dashBoard/[id]/page";
+import {FollowModel} from "@/app/model/follow.model";
+import {fetchUserById} from "@/app/api/user/user.api";
+import {User} from "@/app/model/user.model";
+import followList from "@/app/(page)/user/follow/page";
+import FollowList from "@/app/(page)/user/follow/page";
 
 
 ChartJS.register(Title, Tooltip, Legend, BarElement, ArcElement, CategoryScale, LinearScale);
 
-
-interface User {
-    nickname: string;
-    username: string;
-    role: string;
-}
-
-
 export default function MyPage() {
     const [count, setCount] = useState<CountItem[]>([]);
-    const [region, setRegion] = useState<Area[]>([]);
     const [restaurant, setRestaurant] = useState<RestaurantList[]>([]);
     const [post, setPost] = useState<UserPostModel[]>([]);
     const [activeTab, setActiveTab] = useState<string | undefined>('myPage')
     const [user, setUser] = useState<User | null>(null);
+    const [follower, setFollower] = useState<FollowModel[]>([]);
+    const [following, setFollowing] = useState<FollowModel[]>([]);
+
+
+    const {searchTerm} = useSearchContext();
+    const router = useRouter();
+    const pathname = usePathname();
+    const [isInitialLoad, setIsInitialLoad] = useState(true);
+    const cookies = nookies.get();
+    const userId = cookies.userId;
+
+    const id = pathname?.split('/')[3];
+
 
     useEffect(() => {
-        const countList = async () => {
-            const data = await fetchShowCount();
-            setCount(data);
+        const fetchUser = async () => {
+            const userData = await fetchUserById(userId); // await 추가
+            setUser(userData);
         };
-        countList();
-    }, []);
 
+        fetchUser();
 
-    useEffect(() => {
-        const cookies = nookies.get();
-        const id = cookies.userId;
-        console.log(id)
-
-        if (id) {
-            // 유저 정보를 localStorage에서 가져오기
-            const username = localStorage.getItem('username');
-            const nickname = localStorage.getItem('nickname');
-            const role = localStorage.getItem('role');
-
-            if (username && nickname && role) {
-                const storedUser: User = {
-                    username,
-                    nickname,
-                    role,
-                };
-                setUser(storedUser);
-            }
-
-            // // id를 사용하여 데이터를 가져오는 로직
+        if (userId) {
             const fetchData = async () => {
                 const countData = await fetchShowCount();
                 setCount(countData);
 
-                const regionData = await fetchShowArea();
-                setRegion(regionData);
-
-            //     const restaurantData = await fetchShowRankByAge(id);  // id 사용
-            //     setRestaurant(restaurantData);
-            //
-                const postData = await fetchPostList(id);  // id 사용
+                const postData = await fetchPostList(userId);
                 setPost(postData);
             };
-
             fetchData();
+
+            const countList = async () => {
+                const data = await fetchShowCount();
+                setCount(data);
+            };
+            countList();
+
+            setIsInitialLoad(false);
         }
-    }, []);
+    }, [userId]);
+
+    useEffect(() => {
+        const follow = async () => {
+            if (user?.nickname) {
+                const data1 = await fetchShowFollower(user.nickname);
+                const data2 = await fetchShowFollowing(user.nickname);
+                setFollower(data1);
+                setFollowing(data2);
+                console.log(data1);
+                console.log(data2);
+            }
+        };
+
+        follow();
+    }, [user]);
+
+
+    const totalFollower = follower.length;
+
+    useEffect(() => {
+        if (searchTerm && !isInitialLoad) {
+            router.push(`/?search=${searchTerm}`);
+        }
+    }, [searchTerm]);
 
 
     const [content, setContent] = useState("");
-    const userId = 1; // Replace this with the actual user ID
-    const currentDate = new Date().toISOString(); // Adjust format if needed
+
+    const currentDate = new Date().toISOString();
 
     const submit = async (content: string) => {
         const report: OpinionModel = {
@@ -129,16 +146,6 @@ export default function MyPage() {
         ],
     };
 
-    const areaData = {
-        labels: region.map(item => item.area),
-        datasets: [{
-            data: region.map(item => item.total),
-            backgroundColor: ["#fa8307", "#fd8a12", "#eca459", "#ecb780", "#F4CEA4FF"],
-            borderColor: ["#fff", "#fff", "#fff", "#fff", "#fff"],
-            borderWidth: 1,
-        }],
-    };
-
 
     const restaurantData = {
         labels: restaurant.map(item => item.restaurantName),
@@ -154,6 +161,14 @@ export default function MyPage() {
 
     const totalPost = post.length;
 
+    if (!userId || id !== userId) {
+        return (
+            <div className="unauthorized text-center mt-5">
+                <h2>잘못된 접근입니다</h2>
+                <p>해당 페이지에 접근할 수 없습니다.</p>
+            </div>
+        );
+    }
 
     return (
         <>
@@ -193,6 +208,12 @@ export default function MyPage() {
                                         <strong className="heading6">MyWallet</strong>
                                     </Link>
                                     <Link href={'#!'} scroll={false}
+                                          className={`item flex items-center gap-3 w-full px-5 py-4 rounded-lg cursor-pointer duration-300 hover:bg-white mt-1.5 ${activeTab === 'follow' ? 'active' : ''}`}
+                                          onClick={() => setActiveTab('follow')}>
+                                        <Icon.User size={20}/>
+                                        <strong className="heading6">MyFollow</strong>
+                                    </Link>
+                                    <Link href={'#!'} scroll={false}
                                           className={`item flex items-center gap-3 w-full px-5 py-4 rounded-lg cursor-pointer duration-300 hover:bg-white mt-1.5 ${activeTab === 'dash' ? 'active' : ''}`}
                                           onClick={() => setActiveTab('dash')}>
                                         <Icon.ChartDonut size={20}/>
@@ -230,7 +251,7 @@ export default function MyPage() {
                                                 <h5 className="heading5 mt-1">insert</h5>
                                             </div>
                                         </Link>
-                                        <Icon.Receipt className='text-4xl'/>
+                                        <Icon.Barcode className='text-4xl'/>
                                     </div>
                                     <div
                                         className="item flex items-center justify-between p-5 border border-line rounded-lg box-shadow-xs">
@@ -244,7 +265,7 @@ export default function MyPage() {
                                         className="item flex items-center justify-between p-5 border border-line rounded-lg box-shadow-xs">
                                         <div className="counter">
                                             <span className="tese">MY FOLLOWER</span>
-                                            <h5 className="heading5 mt-1">200</h5>
+                                            <h5 className="heading5 mt-1">{totalFollower}</h5>
                                         </div>
                                         <Icon.UserCircle className='text-4xl'/>
                                     </div>
@@ -271,7 +292,8 @@ export default function MyPage() {
                                     </div>
                                     <h6 className="heading6"> MY POST </h6>
                                     <div className="list overflow-x-auto w-full mt-5">
-                                        <table className="w-full max-[1400px]:w-[700px] max-md:w-[700px] text-center text-sm">
+                                        <table
+                                            className="w-full max-[1400px]:w-[700px] max-md:w-[700px] text-center text-sm">
                                             <thead className="border-b border-line">
                                             <tr className="text-center">
                                                 <th scope="col"
@@ -284,17 +306,23 @@ export default function MyPage() {
                                                     className="pb-3 text-sm font-bold uppercase text-secondary whitespace-nowrap">작성날짜
                                                 </th>
                                                 <th scope="col"
-                                                    className="pb-3 text-sm font-bold uppercase text-secondary whitespace-nowrap">좋아요 수
+                                                    className="pb-3 text-sm font-bold uppercase text-secondary whitespace-nowrap">좋아요
+                                                    수
                                                 </th>
                                             </tr>
                                             </thead>
                                             <tbody>
                                             {post.map(p => (
-                                                <tr key={p.postId} className="item duration-300 border-b border-line">
-                                                    <Link className=" text-sm text-secondary" href={`/restaurant/${p.restaurantId}`}>
-                                                        <th scope="row" className="py-3">
-                                                            <span
-                                                                className="tag px-4 py-1.5 rounded-full bg-orange-100 text-orange font-semibold text-sm">{p.name}</span>
+                                                <tr key={p.postId}
+                                                    className="item duration-300 border-b border-line h-auto">
+                                                    <Link className=" text-sm text-secondary"
+                                                          href={`/restaurant/${p.restaurantId}`}>
+                                                        <th scope="row"
+                                                            className="py-3 whitespace-nowrap overflow-hidden text-ellipsis">
+                                                                <span
+                                                                    className="tag px-4 py-1.5 rounded-full bg-orange-100 text-orange font-semibold text-sm">
+                                                                      {p.name}
+                                                                </span>
                                                         </th>
                                                     </Link>
                                                     <td className="py-3 text-left">
@@ -325,49 +353,14 @@ export default function MyPage() {
                                 <div><MyWallet/></div>
                             </div>
                             <div
+                                className={`tab text-content overflow-hidden w-full p-7 mt-7 border border-line rounded-xl ${activeTab === 'follow' ? 'block' : 'hidden'}`}>
+                                <h6 className="heading6">Follow</h6>
+                                <FollowList/>
+                            </div>
+                            <div
                                 className={`tab text-content overflow-hidden w-full p-7 mt-7 border border-line rounded-xl ${activeTab === 'dash' ? 'block' : 'hidden'}`}>
                                 <h6 className="heading6">DashBoard</h6>
-                                <div className={styles.cardHeader}>연령 별 음식점 랭킹</div>
-                                <div className={styles.cardBody}>
-                                    <div className={styles.chartContainer}>
-                                        <Bar
-                                            data={restaurantData}
-                                            options={{
-                                                responsive: true,
-                                                maintainAspectRatio: false,
-                                                scales: {
-                                                    x: {title: {display: true, text: 'Restaurant'}},
-                                                    y: {title: {display: true, text: 'Count'}},
-                                                },
-                                            }}
-                                        />
-                                    </div>
-                                </div>
-
-
-                                <div className={styles.cardHeader}>음식점 많은 지역 랭킹</div>
-                                <div className={styles.cardBody}>
-                                    <div className={styles.chartContainer}>
-                                        <Doughnut data={areaData} options={{
-                                            responsive: true,
-                                            maintainAspectRatio: false,
-                                            plugins: {
-                                                legend: {
-                                                    position: 'top',
-                                                },
-                                                tooltip: {
-                                                    callbacks: {
-                                                        label: (context) => {
-                                                            const label = context.label || '';
-                                                            const value = context.raw || 0;
-                                                            return `${label}: ${value}`;
-                                                        }
-                                                    }
-                                                }
-                                            }
-                                        }}/>
-                                    </div>
-                                </div>
+                                <UserDash/>
                             </div>
                             <div
                                 className={`tab text-content overflow-hidden w-full p-7 mt-7 border border-line rounded-xl ${activeTab === 'opinion' ? 'block' : 'hidden'}`}>

@@ -2,7 +2,7 @@
 import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from "next/link";
-import { addUser, checkUsernameExists } from "@/app/service/user/user.service";
+import { addUser } from "@/app/service/user/user.service";
 
 export default function Register() {
     const router = useRouter();
@@ -14,15 +14,12 @@ export default function Register() {
     const [tel, setTel] = useState('');
     const [gender, setGender] = useState('');
     const [thumbnail, setThumbnail] = useState<File | null>(null);
-    const [isLoading, setIsLoading] = useState(false); // 로딩 상태 관리
 
-    // 전화번호 유효성 검사 함수
     const isValidPhoneNumber = (phone: string) => {
         const regex = /^\d{3}-\d{4}-\d{4}$/;
         return regex.test(phone);
     };
 
-    // 회원가입 처리 함수
     const handleRegister = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
         const errors = [];
@@ -43,12 +40,6 @@ export default function Register() {
             return;
         }
 
-        const isDuplicate = await checkUsernameExists(username);
-        if (isDuplicate) {
-            alert('Username이 이미 사용 중입니다.');
-            return;
-        }
-
         try {
             const newUser = await addUser(username, password, nickname, name, age, tel, gender, thumbnail ? [thumbnail] : []);
             console.log('User registered:', newUser);
@@ -59,13 +50,11 @@ export default function Register() {
         }
     };
 
-    // 파일 선택 시 처리 함수
     const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         if (event.target.files && event.target.files.length > 0) {
             setThumbnail(event.target.files[0]);
         }
     };
-
 
     return (
         <div className="register-block md:py-20 py-10 mt-10" style={{ borderRadius: '20px', overflow: 'hidden', backgroundColor: '#f9f9f9' }}>

@@ -1,19 +1,24 @@
 "use client";
 
-import Link from "next/link";
 import { useRouter } from "next/navigation";
 import React, { useEffect, useState } from "react";
 import { tag } from "src/app/api/tag/tag.api";
-import {initialTag, TagModel } from "src/app/model/tag.model";
+import {TagModel } from "src/app/model/tag.model";
 import { tagService } from "src/app/service/tag/tag.service";
 
 export default function TagList() {
   const [tags, setTags] = useState<{[category: string]: TagModel[]}>({});
   const [selectTags, setSelectTags] = useState<string[]>([]);
+  const allTags: TagModel[] = Object.values(tags).flat(); 
   const router = useRouter();
+  const [role, setRole] = useState<string | null>(null);
 
   useEffect(() => {
     fetchTag();
+
+    const storedRole = localStorage.getItem('role');
+    setRole(storedRole);
+
   }, []);
 
   const fetchTag = async () => {
@@ -21,18 +26,12 @@ export default function TagList() {
       setTags(data.sort((a: TagModel, b: TagModel) => a.tagCategory.localeCompare(b.tagCategory)));
   };
 
-  const allTags: TagModel[] = Object.values(tags).flat(); // 태그 객체를 배열로 변환
-
   const handleCheck = (name: string) => {
     setSelectTags((prevSelected) =>
       prevSelected.includes(name)
         ? prevSelected.filter((tagName) => tagName !== name)
         : [...prevSelected, name]
     );
-  };
-
-  const handleDetails = (name: string) => {
-    router.push(`tags/details/${name}`);
   };
 
   const handleDelete = async () => {
@@ -62,7 +61,6 @@ export default function TagList() {
     }
   };
 
-  const role = localStorage.getItem('role');
 
   if (role !== 'ADMIN') {
     return (
@@ -77,7 +75,7 @@ export default function TagList() {
 
   return (
     <main className="flex min-h-screen flex-col items-center" style={{ marginTop: '30px' }}>
-      <div className="w-full max-w-4xl bg-white shadow-lg rounded-lg p-6">
+      <div className="w-full max-w-4xl bg-white shadow-lg rounded-lg p-6 text-center">
         <table className="w-full border-collapse bg-white shadow-md rounded-lg overflow-hidden">
           <thead>
             <tr className="bg-[#F46119] text-white">
@@ -99,31 +97,20 @@ export default function TagList() {
                 <td className="py-3 px-4 border-b">
                   <span>{t.tagCategory}</span>
                 </td>
-                <td className="py-3 px-4 border-b">
-                  <Link
-                    href={`/tag/details/${t.name}`}
-                    className="text-[#F46119] hover:underline"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      handleDetails(t.name);
-                    }}
-                  >
-                    {t.name}
-                  </Link>
-                </td>
+                <td className="py-3 px-4 border-b">{t.name}</td>
               </tr>
             ))}
           </tbody>
         </table>
-        <div className="mt-4">
+        <div className="flex justify-end mt-4">
           <button
-            className="bg-transparent hover:bg-gray-200 text-gray-700 font-semibold py-2 px-4 border border-gray-300"
+            className="button-main custom-button mr-2 px-4 py-2 bg-green-500 text-white rounded"
             onClick={() => router.push("/tag/register")}
           >
             등록하기
           </button>
           <button
-           className="bg-transparent hover:bg-gray-200 text-gray-700 font-semibold py-2 px-4 border border-gray-300"
+           className="button-main custom-button mr-2 px-4 py-2 bg-green-500 text-white rounded"
             onClick={handleDelete}
           >
             삭제하기

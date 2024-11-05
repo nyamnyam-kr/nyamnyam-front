@@ -1,10 +1,23 @@
 // /src/app/api/chat/chat.api.ts
-const token = localStorage.getItem('token')
+import EventSourcePolyfill from 'event-source-polyfill';
+
+let token: string | null = null;
+
+if (typeof window !== "undefined") {
+    // 브라우저 환경에서만 localStorage 접근
+    token = localStorage.getItem('token');
+}
 // 채팅 메시지 스트리밍 API
 export const subscribeToChats = (chatRoomId: any, onMessageReceived: (arg0: any) => void) => {
-  const eventSource = new EventSource(`http://localhost:8081/api/chats/${chatRoomId}?token=${token}`, {
-    withCredentials: true
+  const eventSource = new EventSourcePolyfill(`http://localhost:8081/api/chats/${chatRoomId}`, {
+    method: "GET",
+    headers: {
+      'Authorization': token ? `Bearer ${token}` : '',
+      "Content-Type": "application/json",
+  },
+    withCredentials: true,
   });
+
 
   eventSource.onmessage = (event) => {
     const data = JSON.parse(event.data);
@@ -26,9 +39,9 @@ export const sendChat = async (chatRoomId: any, chat: any) => {
   const response = await fetch(`http://localhost:8081/api/chats/${chatRoomId}`, {
     method: "POST",
     headers: {
-      'Authorization': token ? `Bearer ${token}` : '', // JWT 토큰을 Bearer 형식으로 추가
+      'Authorization': token ? `Bearer ${token}` : '',
       "Content-Type": "application/json",
-    },
+  },
     body: JSON.stringify(chat),
   });
 
@@ -47,9 +60,9 @@ export const getUnreadCount = async (chatRoomId: string, nickname: string): Prom
   const response = await fetch(`http://localhost:8081/api/chats/${chatRoomId}/unreadCount/${nickname}`, {
     method: "GET",
     headers: {
-      'Authorization': token ? `Bearer ${token}` : '', // JWT 토큰을 Bearer 형식으로 추가
+      'Authorization': token ? `Bearer ${token}` : '',
       "Content-Type": "application/json",
-    },
+  },
   });
 
   if (!response.ok) {
@@ -65,9 +78,9 @@ export const getNotReadParticipantsCount = async (chatId: string): Promise<numbe
   const response = await fetch(`http://localhost:8081/api/chats/${chatId}/notReadParticipantsCount`, {
     method: "GET",
     headers: {
-      'Authorization': token ? `Bearer ${token}` : '', // JWT 토큰을 Bearer 형식으로 추가
+      'Authorization': token ? `Bearer ${token}` : '',
       "Content-Type": "application/json",
-    },
+  },
   });
 
   if (!response.ok) {
@@ -83,9 +96,9 @@ export const markMessageAsRead = async (chatId: string, nickname: string): Promi
   const response = await fetch(`http://localhost:8081/api/chats/${chatId}/read/${nickname}`, {
     method: 'PATCH',
     headers: {
-      'Authorization': token ? `Bearer ${token}` : '', // JWT 토큰을 Bearer 형식으로 추가
+      'Authorization': token ? `Bearer ${token}` : '',
       "Content-Type": "application/json",
-    },
+  },
   });
 
   if (!response.ok) {
@@ -102,9 +115,9 @@ export const updateReadBy = async (chatId: string, nickname: string): Promise<an
   const response = await fetch(`http://localhost:8081/api/chats/${chatId}/read/${nickname}`, {
     method: 'PUT', // 새로 추가된 PUT 메서드
     headers: {
-      'Authorization': token ? `Bearer ${token}` : '', // JWT 토큰을 Bearer 형식으로 추가
+      'Authorization': token ? `Bearer ${token}` : '',
       "Content-Type": "application/json",
-    },
+  },
   });
 
   if (!response.ok) {

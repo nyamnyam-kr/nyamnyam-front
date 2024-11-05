@@ -11,6 +11,7 @@ import { restaurant } from '@/app/api/restaurant/restaurant.api';
 import { Camera, X } from '@phosphor-icons/react/dist/ssr';
 import Modal from '@/app/components/Modal';
 import { useDropzone } from 'react-dropzone';
+
 import nookies from 'nookies';
 
 export default function PostRegister() {
@@ -267,7 +268,7 @@ export default function PostRegister() {
         </button>
         <button
           type="button" className="button-main custom-button px-4 py-2 bg-gray-500 text-white rounded"
-          onClick={() => router.push(`/post/${restaurantId}`)}>
+          onClick={() => router.push(`/restaurant/${restaurantId}`)}>
           뒤로가기
         </button>
       </div>

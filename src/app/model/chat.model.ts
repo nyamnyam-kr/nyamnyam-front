@@ -9,6 +9,5 @@ export interface ChatModel {
    // 추가: 총 참가자 수 (읽지 않은 메시지 수를 계산할 때 필요)
    totalParticipants: number;
     
-   files?: { url: string }[]; // files는 배열일 수 있고, 없을 수도 있음
 }
 

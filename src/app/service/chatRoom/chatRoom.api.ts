@@ -1,36 +1,10 @@
 // /src/app/service/chatRoom/chatRoom.api.ts
 import { deleteChatRoomApi, fetchChatRoomById, fetchChatRoomCount, fetchChatRooms } from "src/app/api/chatRoom/chatRoom.api";
 import { ChatRoomModel } from "src/app/model/chatRoom.model";
-
-export async function insertChatRoom(chatRoom: ChatRoomModel): Promise<any | { status: number }> {
-  try {
-
-    const token = localStorage.getItem('token')
-    const response = await fetch('http://localhost:8081/api/chatRoom/save', {
-      method: "POST",
-    headers: {
-      'Authorization': token ? `Bearer ${token}` : '', // JWT 토큰을 Bearer 형식으로 추가
-      "Content-Type": "application/json",
-    },
-      body: JSON.stringify(chatRoom)
-    });
-    console.log(chatRoom)
+import {customFetch} from "@/app/service/user/fetchClient";
 
 
-    if (!response.ok) {
-      const errorData = await response.json();
-      console.error('Error response:', errorData);
-      return { status: response.status };
-    }
 
-    const data = await response.json();
-    return data;
-
-  } catch (e) {
-    console.log('There has been a problem with your fetch operation', e);
-    return { status: 500 };
-  }
-}
 
 export const getChatRoomData = async (nickname:string) => {
   try {
@@ -54,10 +28,10 @@ export const getChatRoomDetails = async (chatRoomId: any) => {
   }
 };
 
-export const deleteChatRoomsService = async (chatRoomIds: string[]) => {
+export const deleteChatRoomsService = async (chatRoomIds: string[],nickname: string) => {
   if (chatRoomIds.length === 0) {
     throw new Error("삭제할 채팅방이 없습니다.");
   }
 
-  await Promise.all(chatRoomIds.map(id => deleteChatRoomApi(id)));
+  await Promise.all(chatRoomIds.map(id => deleteChatRoomApi(id,nickname)));
 };
