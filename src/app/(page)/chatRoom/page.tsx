@@ -44,7 +44,7 @@ export default function Home1() {
   const [newParticipantName, setNewParticipantName] = useState<string>(""); // 입력받은 참가자 이름
   const [readBy, setReadBy] = useState<{ [key: string]: boolean }>({}); // 메시지 읽음 상태 관리
   const [files, setFiles] = useState([]); // 업로드할 파일을 관리하는 상
-
+  const token =localStorage.getItem('token')
   useEffect(() => {
     const nickname = localStorage.getItem('nickname');
     if (nickname) {
@@ -96,7 +96,7 @@ export default function Home1() {
   };
 
   // 선택된 채팅방의 메시지를 가져오고 읽음 상태 처리하기
-   useEffect(() => {
+  useEffect(() => {
     if (!selectedChatRoomId) return;
 
     getChatRoomDetails(selectedChatRoomId)
@@ -112,9 +112,11 @@ export default function Home1() {
       })
       .catch((error) => console.error(error));
 
-      const token = localStorage.getItem('token');
-      // 메시지 스트리밍 구독
-      const eventSource = new EventSource(`http://localhost:8081/api/chats/${selectedChatRoomId}?token=${token}`);
+    const token = localStorage.getItem('token');
+    // 메시지 스트리밍 구독
+    const eventSource = new EventSource(`http://localhost:8081/api/chats/${selectedChatRoomId}?token=${token}`, {
+      withCredentials: true,
+    });
 
     eventSource.onmessage = async (event) => {
       const newMessage = JSON.parse(event.data);
@@ -159,6 +161,8 @@ export default function Home1() {
 
     eventSource.onerror = (event) => {
       console.error("EventSource 에러:", event);
+      console.error("EventSource 상태:", event.target); // EventSource의 상태 확인
+      console.error("EventSource URL:", event.target); // EventSource URL 확인
       eventSource.close(); // 에러 발생 시 EventSource 종료
     };
 
@@ -177,38 +181,60 @@ export default function Home1() {
     );
   };
 
+  const handleImageUpload = async (event) => {
+    const file = event.target.files[0];
+    if (!file) return;
+
+    const data = new FormData();
+    data.append('file', file);
+
+    try {
+      const response = await fetch('http://localhost:8081/api/chats/uploads', {
+        method: 'POST', // 새로 추가된 PUT 메서드
+        headers: {
+          'Authorization': token ? `Bearer ${token}` : '', // JWT 토큰을 Bearer 형식으로 추가
+        },
+        body: data,
+      });
+
+      if (!response.ok) throw new Error('Image upload failed');
+
+      const result = await response.json();
+      const imageUrl = result.url; // 업로드된 이미지 URL
+
+      // 채팅 메시지에 이미지 URL 추가
+      setNewMessage((prev) => prev + `<img src="${imageUrl}" alt="Uploaded Image" />`);
+    } catch (error) {
+      console.error(error);
+      alert('이미지 업로드 중 오류가 발생했습니다.');
+    }
+  };
+
 
   // 메시지 전송 함수
   // sendMessage 함수에서 새로운 메시지를 보낼 때 호출
-  const sendMessage = async (e: React.FormEvent) => {
+  const sendMessage = async (e) => {
     e.preventDefault();
 
     const newMessageData = {
       sender,
       message: newMessage,
-      readBy: { [sender]: true }, // 보낸 사용자의 읽음 상태 추가
-      files
+      readBy: { [sender]: true },
+      files, // 파일 추가
     };
 
     try {
       const sentMessage = await sendMessageService(selectedChatRoomId, newMessageData);
       setMessages((prevMessages) => {
-        const messageExists = prevMessages.some(msg => msg.id === sentMessage.id);
+        const messageExists = prevMessages.some((msg) => msg.id === sentMessage.id);
         return messageExists ? prevMessages : [...prevMessages, sentMessage];
       });
       setNewMessage("");
       setFiles([]); // 메시지 전송 후 파일 초기화
     } catch (error) {
       console.error(error);
-      alert('메시지 전송 중 오류가 발생했습니다.'); // 사용자에게 알림
+      alert('메시지 전송 중 오류가 발생했습니다.');
     }
-  };
-
-
-  // CKEditor의 onChange 이벤트를 통해 입력된 메시지 업데이트
-  const handleEditorChange = (event: any, editor: any) => {
-    const data = editor.getData(); // CKEditor의 데이터를 가져옴
-    setNewMessage(data); // 입력된 데이터를 newMessage 상태로 업데이트
   };
 
   const toggleEmojiPicker = () => {
@@ -219,7 +245,6 @@ export default function Home1() {
   const handleEmojiSelect = (emoji: string) => {
     setNewMessage((prevMessage) => prevMessage + emoji);
   };
-
 
 
   const handleDelete = async () => {
@@ -266,10 +291,10 @@ export default function Home1() {
 
     if (result.status === 200) {
       alert("채팅방이 성공적으로 생성되었습니다.");
-      const storedUser = localStorage.getItem('user');
-      if (storedUser) {
-        const parsedUser = JSON.parse(storedUser);
-        fetchData(parsedUser.nickname); // user.nickname으로 파라미터 전달
+      const nickname = localStorage.getItem('nickname');
+      if (nickname) {
+
+        fetchData(nickname); // user.nickname으로 파라미터 전달
       }
     }
 
@@ -495,17 +520,21 @@ export default function Home1() {
                           </div>
                         )}
 
-                        {/* ClassicEditor 적용 */}
-                        <CKEditor
-                          editor={ClassicEditor}
-                          data={newMessage}
-                          onChange={handleEditorChange}
-                          config={{
-                            ckfinder: {
-                              uploadUrl: 'http://localhost:8081/api/chats/uploads',
-                            },
-                            placeholder: '메시지를 입력하세요...',
-                          }}
+                        {/* 메시지 입력 */}
+                        <input
+                          type="text"
+                          value={newMessage}
+                          onChange={(e) => setNewMessage(e.target.value)}
+                          placeholder="메시지를 입력하세요..."
+                          className="flex-grow border rounded-md p-2"
+                        />
+
+                        {/* 이미지 업로드 */}
+                        <input
+                          type="file"
+                          accept="image/*"
+                          onChange={handleImageUpload}
+                          className="ml-2"
                         />
                       </div>
                       <button

@@ -6,7 +6,7 @@ import * as Icon from "@phosphor-icons/react/dist/ssr";
 import { jwtDecode } from 'jwt-decode';
 import nookies from 'nookies';
 
-import {authenticateUser} from "@/app/service/user/user.service";
+import { authenticateUser } from "@/app/service/user/user.service";
 
 interface DecodedToken {
     sub: string;
@@ -40,7 +40,7 @@ export default function Home() {
             localStorage.setItem('username', decoded.username);
             localStorage.setItem('role', decoded.role);
             localStorage.setItem('score', String(decoded.score));
-            
+
 
             // 홈 페이지로 이동
             router.push("/");
@@ -60,13 +60,13 @@ export default function Home() {
                         <form className="md:mt-7 mt-4" onSubmit={handleLogin}>
                             <div className="username">
                                 <input className="border-line px-4 pt-3 pb-3 w-full rounded-lg" id="username"
-                                       type="username" placeholder="username" required
-                                       value={username} onChange={(e) => setUsername(e.target.value)} />
+                                    type="username" placeholder="username" required
+                                    value={username} onChange={(e) => setUsername(e.target.value)} />
                             </div>
                             <div className="pass mt-5">
                                 <input className="border-line px-4 pt-3 pb-3 w-full rounded-lg" id="password"
-                                       type="password" placeholder="Password *" required
-                                       value={password} onChange={(e) => setPassword(e.target.value)} />
+                                    type="password" placeholder="Password *" required
+                                    value={password} onChange={(e) => setPassword(e.target.value)} />
                             </div>
                             <div className="flex items-center justify-between mt-5">
                                 <div className='flex items-center'>

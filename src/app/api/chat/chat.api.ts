@@ -3,7 +3,7 @@ const token = localStorage.getItem('token')
 // 채팅 메시지 스트리밍 API
 export const subscribeToChats = (chatRoomId: any, onMessageReceived: (arg0: any) => void) => {
   const eventSource = new EventSource(`http://localhost:8081/api/chats/${chatRoomId}?token=${token}`, {
-
+    withCredentials: true
   });
 
   eventSource.onmessage = (event) => {
