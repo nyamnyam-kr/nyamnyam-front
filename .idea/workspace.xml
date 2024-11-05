@@ -4,17 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="49786053-a601-4996-9fe6-17ac685f1975" name="Changes" comment="">
-<<<<<<< HEAD
-      <change beforePath="$PROJECT_DIR$/yarn.lock" beforeDir="false" afterPath="$PROJECT_DIR$/yarn.lock" afterDir="false" />
-=======
-      <change afterPath="$PROJECT_DIR$/src/app/service/user/fetchClient.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/app/(page)/user/login/page.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/app/(page)/user/login/page.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/app/components/common/Header.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/app/components/common/Header.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/app/service/chatRoom/chatRoom.api.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/app/service/chatRoom/chatRoom.api.ts" afterDir="false" />
->>>>>>> nyamnyam-user
-    </list>
+    <list default="true" id="49786053-a601-4996-9fe6-17ac685f1975" name="Changes" comment="" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -30,7 +20,7 @@
   <component name="Git.Settings">
     <option name="RECENT_BRANCH_BY_REPOSITORY">
       <map>
-        <entry key="$PROJECT_DIR$" value="nyamnyam-user" />
+        <entry key="$PROJECT_DIR$" value="nyamnyam-admin" />
       </map>
     </option>
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
@@ -51,6 +41,9 @@
   <component name="KubernetesApiProvider">{
   &quot;isMigrated&quot;: true
 }</component>
+  <component name="ProblemsViewState">
+    <option name="selectedTabId" value="ProjectErrors" />
+  </component>
   <component name="ProjectColorInfo">{
   &quot;associatedIndex&quot;: 8
 }</component>
@@ -64,17 +57,17 @@
   "keyToString": {
     "RunOnceActivity.ShowReadmeOnStart": "true",
     "SHARE_PROJECT_CONFIGURATION_FILES": "true",
-    "git-widget-placeholder": "nyamnyam-user",
+    "git-widget-placeholder": "release0.08",
     "ignore.virus.scanning.warn.message": "true",
     "kotlin-language-version-configured": "true",
-    "last_opened_file_path": "C:/Users/bitcamp/team/release/nyamnyam-front",
+    "last_opened_file_path": "C:/Users/bitcamp/team/release/nyamnyam-kr",
     "node.js.detected.package.eslint": "true",
     "node.js.detected.package.tslint": "true",
     "node.js.selected.package.eslint": "(autodetect)",
     "node.js.selected.package.tslint": "(autodetect)",
     "nodejs_package_manager_path": "yarn",
     "run.code.analysis.last.selected.profile": "pProject Default",
-    "ts.external.directory.path": "C:\\Users\\bitcamp\\Documents\\GitHub\\nyamnyam-front\\node_modules\\typescript\\lib",
+    "ts.external.directory.path": "C:\\Users\\APRO\\Desktop\\team\\기능별\\release\\nyamnyam-front\\node_modules\\typescript\\lib",
     "vue.rearranger.settings.migration": "true"
   }
 }]]></component>
@@ -84,6 +77,8 @@
       <recent name="C:\Users\USER\Documents\nyamnyam\nyamnyam-front\src\app\model" />
     </key>
     <key name="MoveFile.RECENT_KEYS">
+      <recent name="C:\Users\USER\Documents\nyamnyam\nyamnyam-front\src\app\(page)\user\dashBoard\[id]" />
+      <recent name="C:\Users\USER\Documents\nyamnyam\nyamnyam-front\src\app\(page)\user\mypage\[id]" />
       <recent name="C:\Users\bitcamp\Documents\GitHub\nyamnyam-front\src\app\components" />
       <recent name="C:\Users\USER\Documents\nyamnyam\nyamnyam-front\src\app\(page)\user\wallet\[id]" />
       <recent name="C:\Users\USER\Documents\nyamnyam\nyamnyam-front\src\app\(page)\admin" />
@@ -92,8 +87,8 @@
   <component name="SharedIndexes">
     <attachedChunks>
       <set>
-        <option value="bundled-jdk-9823dce3aa75-b114ca120d71-intellij.indexing.shared.core-IU-242.20224.419" />
-        <option value="bundled-js-predefined-d6986cc7102b-410509235cf1-JavaScript-IU-242.20224.419" />
+        <option value="bundled-jdk-9823dce3aa75-28b599e66164-intellij.indexing.shared.core-IU-242.23339.11" />
+        <option value="bundled-js-predefined-d6986cc7102b-5c90d61e3bab-JavaScript-IU-242.23339.11" />
       </set>
     </attachedChunks>
   </component>
@@ -127,6 +122,23 @@
       <workItem from="1728099778167" duration="187000" />
       <workItem from="1728110739533" duration="203000" />
       <workItem from="1728280154645" duration="61000" />
+      <workItem from="1728529597572" duration="17588000" />
+      <workItem from="1728380955440" duration="817000" />
+      <workItem from="1728519810430" duration="40000" />
+      <workItem from="1728619489876" duration="6000" />
+      <workItem from="1728619506858" duration="652000" />
+      <workItem from="1728638525159" duration="857000" />
+      <workItem from="1728643549463" duration="460000" />
+      <workItem from="1728703500768" duration="298000" />
+      <workItem from="1728739600443" duration="814000" />
+      <workItem from="1728806892738" duration="4754000" />
+      <workItem from="1728883228374" duration="8496000" />
+      <workItem from="1728904203893" duration="5029000" />
+      <workItem from="1728952929892" duration="4347000" />
+      <workItem from="1728969248517" duration="2873000" />
+      <workItem from="1728989962295" duration="171000" />
+      <workItem from="1729220647301" duration="16000" />
+      <workItem from="1730270663547" duration="21000" />
     </task>
     <servers />
   </component>
