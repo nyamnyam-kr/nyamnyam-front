@@ -9,8 +9,8 @@ import { FollowModel } from "@/app/model/follow.model";
 
 import { useRouter } from 'next/navigation';
 import { fetchUserById } from "@/app/api/user/user.api";
-import { Modal } from 'react-bootstrap';
 import { checkChatRoom, insertChatRoom } from '@/app/api/chatRoom/chatRoom.api';
+import Modal from '@/app/components/Modal';
 
 interface AccountProps {
     selectUser: User;
