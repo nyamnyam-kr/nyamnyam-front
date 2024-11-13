@@ -43,7 +43,7 @@ export default function Account(selectUser: Partial<AccountProps>) {
 
             const checkFollowStatus = async () => {
                 const followingUser = selectUser?.selectUser.nickname;
-                const result = await fetchIsFollow(followingUser, user.nickname);
+                const result = await fetchIsFollow(followingUser, localStorage.getItem('nickname'));
                 setIsFollowing(result);
             };
 

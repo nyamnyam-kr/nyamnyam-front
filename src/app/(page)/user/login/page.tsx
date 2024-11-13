@@ -9,6 +9,7 @@ import Modal from "@/app/components/Modal";
 
 import { authenticateUser } from "@/app/service/user/user.service";
 import useModalAlert from "@/app/context/useModalAlert";
+import { useUserContext } from '@/app/context/UserContext';
 
 interface DecodedToken {
     sub: string;
@@ -24,6 +25,7 @@ export default function Home() {
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
     const { isModalOpen, modalMessage, showModalAlert, closeModal } = useModalAlert();
+    const { setUser } = useUserContext(); // user context의 setUser 메소드 사용
 
     const handleLogin = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
@@ -38,6 +40,14 @@ export default function Home() {
             localStorage.setItem('role', decoded.role);
             localStorage.setItem('score', String(decoded.score));
 
+             // setUser를 호출하여 사용자 정보를 업데이트
+             setUser({
+                token: token,
+                username: decoded.nickname,
+                nickname: decoded.nickname,
+                role: decoded.role,
+                userId: decoded.sub,
+            });
             router.push("/");
         } catch (error) {
             console.error('Login failed:', error);
