@@ -9,7 +9,6 @@ import { FollowModel } from "@/app/model/follow.model";
 
 import { useRouter } from 'next/navigation';
 import { fetchUserById } from "@/app/api/user/user.api";
-
 import { checkChatRoom, insertChatRoom } from '@/app/api/chatRoom/chatRoom.api';
 import Modal from '@/app/components/Modal';
 
@@ -44,7 +43,7 @@ export default function Account(selectUser: Partial<AccountProps>) {
 
             const checkFollowStatus = async () => {
                 const followingUser = selectUser?.selectUser.nickname;
-                const result = await fetchIsFollow(followingUser, user.nickname);
+                const result = await fetchIsFollow(followingUser, localStorage.getItem('nickname'));
                 setIsFollowing(result);
             };
 
@@ -149,7 +148,7 @@ export default function Account(selectUser: Partial<AccountProps>) {
                     selectUser.selectUser?.id === userId ? (
                         <Link href="/user/follow" passHref>
                             <button type="submit"
-                                    className="px-4 py-2 bg-[#41B3A3] text-white rounded hover:bg-[#178E7F]">
+                                className="px-4 py-2 bg-[#41B3A3] text-white rounded hover:bg-[#178E7F]">
                                 팔로우
                             </button>
                         </Link>
@@ -161,7 +160,7 @@ export default function Account(selectUser: Partial<AccountProps>) {
                         </button>
                     ) : (
                         <button onClick={handleFollow}
-                                className="px-4 py-2 bg-[#41B3A3] text-white rounded hover:bg-[#178E7F]">
+                            className="px-4 py-2 bg-[#41B3A3] text-white rounded hover:bg-[#178E7F]">
                             팔로우하기
                         </button>
                     )
